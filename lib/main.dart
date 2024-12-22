@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projects/widgets/button.dart';
+import 'package:projects/screen/Homescreen.dart'; // 분리한 홈 화면 import
 
 void main() {
   runApp(const MyApp());
@@ -11,6 +11,7 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 
+  // 다른 화면에서도 호출할 수 있도록 static method로 예시
   static void addSomething() {
     print('Adding!!!');
   }
@@ -21,21 +22,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xffeeeeee),
+        scaffoldBackgroundColor: const Color(0xffF4F5F7),
+        fontFamily: 'Inter',
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('2024/12/05'),
-        ),
-        body: const Center(
-          child: Text('Body'),
-        ),
-        floatingActionButton: const Button(
-          addPressed: MyApp.addSomething,
-        ), // 버튼을 오른쪽 하단에 배치
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.endFloat, // 위치 지정
-      ),
+      home: const HomeScreen(), // 홈 화면을 따로 분리
     );
   }
 }
