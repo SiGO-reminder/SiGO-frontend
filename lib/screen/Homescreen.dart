@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:projects/widgets/button.dart';
-import 'package:projects/main.dart'; // addSomething() 호출용
+import 'package:projects/widgets/plus_button.dart';
+import 'package:projects/widgets/AlarmBox.dart';
+import 'package:projects/main.dart';
+import 'package:flutter/cupertino.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,8 +45,25 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: const Center(
-        child: Text('Body4'),
+      body: const SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+              AlarmBox(),
+            ],
+          ),
+        ),
       ),
       floatingActionButton: const Button(
         addPressed: MyApp.addSomething,
@@ -47,6 +71,7 @@ class HomeScreen extends StatelessWidget {
       bottomNavigationBar: SizedBox(
         height: 69,
         child: BottomNavigationBar(
+          elevation: 4,
           backgroundColor: Colors.white,
           showSelectedLabels: false,
           showUnselectedLabels: false,
