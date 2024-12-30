@@ -14,7 +14,7 @@ class Button extends StatelessWidget {
       onPressed: addPressed,
       backgroundColor: const Color(0xff5FB7FF),
       shape: const CircleBorder(),
-      elevation: 0,
+      elevation: 4,
       child: const Icon(
         Icons.add_rounded,
         size: 56,
