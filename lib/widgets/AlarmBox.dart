@@ -9,7 +9,7 @@ class AlarmBox extends StatefulWidget {
 }
 
 class _AlarmBoxState extends State<AlarmBox> {
-  bool isChecked = true; // 알람이 켜져있는지 꺼져있는지 확인인
+  bool isChecked = true; // 알람이 켜져있는지 꺼져있는지 확인
 
   void _handleTap() {
     // 버튼이 눌렸을 때의 동작

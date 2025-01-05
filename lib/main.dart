@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 
   // 다른 화면에서도 호출할 수 있도록
   static void addSomething() {
-    print('Adding!!!'); //HomeScreen '+'버튼 함수
+    print('HomeScreen  + 버튼 함수'); //HomeScreen '+'버튼 함수
   }
 }
 
@@ -26,7 +26,7 @@ class _MyAppState extends State<MyApp> {
         scaffoldBackgroundColor: const Color(0xffF4F5F7),
         fontFamily: 'Inter',
       ),
-      home: const HomeScreen(), //홈화면면면
+      home: const HomeScreen(), //홈화면
     );
   }
 }
