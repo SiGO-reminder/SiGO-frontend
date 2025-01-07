@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:projects/screen/new_alarm.dart';
 import 'package:projects/widgets/plus_button.dart';
 import 'package:projects/widgets/draggableScrollableSheet.dart';
 import 'package:projects/widgets/alarmBox.dart';
-import 'package:projects/main.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:projects/widgets/dateCircle.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,23 +13,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _selectedbottomNavigationIcon = 1;
+  int sorting_criteria = 1; //이건 사용자에 따라 별도 설정
   @override
   Widget build(BuildContext context) {
-    const AlarmStack = SafeArea(
+    var AlarmStack = SafeArea(
       child: SingleChildScrollView(
         child: Column(
           children: [
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
-            AlarmBox(),
+            if (sorting_criteria == 2) const DateCircle(),
+            const AlarmBox(),
+            const AlarmBox(),
+            const AlarmBox(),
           ],
         ),
       ),
@@ -45,11 +40,12 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  '2024/12/25',
+                  '2024/11/30',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.32,
                   ),
                 ),
                 PopupMenuButton(
@@ -71,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           size: 20,
                         ),
                         title: Text(
-                          "정렬",
+                          "Style",
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w200,
@@ -82,7 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     PopupMenuItem(
                       onTap: () {
-                        print("#1");
+                        setState(() {
+                          sorting_criteria = 1;
+                        });
+                        print(sorting_criteria);
                       },
                       child: const ListTile(
                         title: Text(
@@ -98,7 +97,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const PopupMenuDivider(),
                     PopupMenuItem(
                       onTap: () {
-                        print("#2");
+                        setState(() {
+                          sorting_criteria = 2;
+                        });
+                        print(sorting_criteria);
                       },
                       child: const ListTile(
                         title: Text(
@@ -118,45 +120,53 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: const Stack(
+      body: Stack(
         children: [
           AlarmStack,
-          ScrollableSheet(),
+          if (sorting_criteria == 1) const ScrollableSheet(),
         ],
       ),
-      floatingActionButton: const Button(
-        addPressed: MyApp.addSomething,
+      floatingActionButton: plus_Button(
+        onPressed: () {
+          // print('new_alarm으로 이동');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewAlarmScreen()),
+          );
+        },
       ),
       bottomNavigationBar: SizedBox(
+        // margin: const EdgeInsets.symmetric(horizontal: 20),
         height: 69,
         child: BottomNavigationBar(
-          elevation: 4,
+          currentIndex: _selectedbottomNavigationIcon,
+          onTap: (index) {
+            setState(
+              () {
+                _selectedbottomNavigationIcon = index;
+                print(index);
+              },
+            );
+          },
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
           backgroundColor: Colors.white,
           showSelectedLabels: false,
           showUnselectedLabels: false,
-          items: const <BottomNavigationBarItem>[
+          selectedFontSize: 0,
+          selectedItemColor: const Color(0xff5FB7FF),
+          unselectedItemColor: const Color(0xffB3B3B3),
+          items: const [
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person_outline,
-                size: 35,
-                color: Color(0xffB3B3B3),
-              ),
+              icon: Icon(Icons.person, size: 45),
               label: 'Personal',
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home_outlined,
-                size: 35,
-                color: Color(0xff5FB7FF),
-              ),
+              icon: Icon(Icons.home_rounded, size: 45),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.more_horiz_rounded,
-                size: 35,
-                color: Color(0xffB3B3B3),
-              ),
+              icon: Icon(Icons.more_horiz_rounded, size: 45),
               label: 'SeeMore',
             ),
           ],

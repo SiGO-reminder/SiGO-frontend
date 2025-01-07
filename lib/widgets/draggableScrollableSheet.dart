@@ -12,6 +12,7 @@ class ScrollableSheet extends StatelessWidget {
       maxChildSize: 1.0,
       builder: (BuildContext context, ScrollController scrollController) {
         return SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 2),
           controller: scrollController,
           child: Column(
             children: [
@@ -29,7 +30,7 @@ class ScrollableSheet extends StatelessWidget {
                     flex: 1,
                     child: Container(
                       width: double.infinity,
-                      height: 30,
+                      height: 40,
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
@@ -40,11 +41,10 @@ class ScrollableSheet extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey,
+                            color: Color(0x19000000),
                             spreadRadius: 0,
-                            blurRadius: 5.0,
-                            offset:
-                                Offset(0, -0.01), // changes position of shadow
+                            blurRadius: 30,
+                            offset: Offset(0, 3), // changes position of shadow
                           ),
                         ],
                       ),
@@ -77,7 +77,7 @@ class ScrollableSheet extends StatelessWidget {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey,
+                            color: Color(0x19000000),
                             spreadRadius: 0,
                             blurRadius: 5.0,
                             offset:
@@ -107,7 +107,7 @@ class ScrollableSheet extends StatelessWidget {
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey,
+                            color: Color(0x19000000),
                             spreadRadius: 0,
                             blurRadius: 5.0,
                             offset:
@@ -138,6 +138,7 @@ class ScrollableSheet extends StatelessWidget {
                               fontSize: 20,
                               fontWeight: FontWeight.w400,
                               color: Color(0xff757575),
+                              letterSpacing: -0.80,
                             ),
                           ),
                         ),
@@ -146,7 +147,7 @@ class ScrollableSheet extends StatelessWidget {
                           child: Icon(
                             Icons.calendar_today_outlined,
                             color: Color(0xff757575),
-                            size: 19,
+                            size: 20,
                           ),
                         )
                       ],
@@ -181,9 +182,9 @@ class nextCalender extends StatelessWidget {
         title: Text(
           "2077/01/01",
           style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w400,
-          ),
+              fontSize: 20,
+              fontWeight: FontWeight.w300,
+              color: Color(0xFF757575)),
         ),
         initiallyExpanded: false,
         backgroundColor: Color(0xffF4F5F7),

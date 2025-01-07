@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:projects/screen/Homescreen.dart'; // 분리한 홈 화면 import
-import 'package:flutter/cupertino.dart';
 
 void main() {
+  //시작화면 구현하기 위해 추가
   runApp(const MyApp());
 }
 
@@ -13,9 +13,6 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 
   // 다른 화면에서도 호출할 수 있도록
-  static void addSomething() {
-    print('HomeScreen  + 버튼 함수'); //HomeScreen '+'버튼 함수
-  }
 }
 
 class _MyAppState extends State<MyApp> {
@@ -27,6 +24,7 @@ class _MyAppState extends State<MyApp> {
         fontFamily: 'Inter',
       ),
       home: const HomeScreen(), //홈화면
+      // home: const NewAlarm(), //홈화면
     );
   }
 }
