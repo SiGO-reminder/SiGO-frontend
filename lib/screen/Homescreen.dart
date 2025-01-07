@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projects/screen/new_alarm.dart';
+import 'package:projects/screen/NewAlarm.dart';
 import 'package:projects/widgets/plus_button.dart';
 import 'package:projects/widgets/draggableScrollableSheet.dart';
 import 'package:projects/widgets/alarmBox.dart';
