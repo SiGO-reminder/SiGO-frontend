@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:projects/screen/LocationSearchScreen.dart';
 
 class LocationInputWidget extends StatefulWidget {
-  final ValueChanged<String> onLocationSelected;
+  final ValueChanged<Map<String, String>> onLocationSelected; // x, y 포함 콜백
 
   const LocationInputWidget({super.key, required this.onLocationSelected});
 
@@ -10,39 +11,59 @@ class LocationInputWidget extends StatefulWidget {
 }
 
 class _LocationInputWidgetState extends State<LocationInputWidget> {
-  final TextEditingController locationController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    // 컨트롤러 리스너 추가 (입력값을 실시간으로 감지)
-    locationController.addListener(() {
-      widget.onLocationSelected(locationController.text);
-    });
-  }
-
-  @override
-  void dispose() {
-    // 메모리 누수 방지를 위해 컨트롤러 해제
-    locationController.dispose();
-    super.dispose();
-  }
+  String? selectedLocation; // 사용자에게 보여줄 건물명
+  String? selectedX; // 경도
+  String? selectedY; // 위도
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: locationController,
-      decoration: const InputDecoration(
-        labelText: '장소 입력',
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.location_on),
-      ),
-      // 키보드 입력 설정
-      textInputAction: TextInputAction.done,
-      keyboardType: TextInputType.text, // 키보드 타입 설정
-      onSubmitted: (value) {
-        widget.onLocationSelected(value); // 완료 버튼 클릭 시 저장
+    return InkWell(
+      onTap: () async {
+        // 위치 검색 화면으로 이동
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LocationSearchScreen(
+              onLocationSelected: (location) {
+                setState(() {
+                  // 선택한 위치 정보 저장
+                  selectedLocation = location['location']; // 건물명
+                  selectedX = location['x']; // 경도
+                  selectedY = location['y']; // 위도
+                });
+
+                // 콜백 호출하여 부모 위젯에 전달
+                widget.onLocationSelected({
+                  'location': location['location']!,
+                  'x': location['x']!,
+                  'y': location['y']!,
+                });
+              },
+            ),
+          ),
+        );
       },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // 선택한 위치 표시 (없을 시 기본 문구)
+            Text(
+              selectedLocation ?? '장소를 선택하세요',
+              style: TextStyle(
+                fontSize: 16,
+                color: selectedLocation == null ? Colors.grey : Colors.black,
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+          ],
+        ),
+      ),
     );
   }
 }

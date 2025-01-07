@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xffF4F5F7),
-        fontFamily: 'Inter',
+        fontFamily: 'Pretendard',
       ),
       home: const HomeScreen(), //홈화면
       // home: const NewAlarm(), //홈화면
