@@ -18,6 +18,11 @@ class PopupMenuWidget extends StatelessWidget {
       itemBuilder: (context) => <PopupMenuEntry>[
         PopupMenuItem(
           padding: const EdgeInsets.fromLTRB(12, 0, 8, 0),
+          onTap: () {
+            if (onCriteriaSelected != null) {
+              onCriteriaSelected!(1);
+            }
+          },
           child: ListTile(
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
