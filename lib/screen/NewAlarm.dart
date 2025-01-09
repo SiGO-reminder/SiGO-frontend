@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:projects/widgets/newAlarm/InputTitleWidget.dart';
 import 'package:projects/widgets/newAlarm/DatePickerWidget.dart';
 import 'package:projects/widgets/newAlarm/TimePickerWidget.dart';
-import 'package:projects/widgets/newAlarm/LocationInputWidget.dart';
 import 'package:projects/widgets/newAlarm/TransportSelectorWidget.dart';
 import 'package:projects/widgets/newAlarm/ConfirmButtonWidget.dart';
 import 'package:projects/utils/DataStorage.dart';
@@ -92,102 +91,191 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('새 일정 추가'),
-        backgroundColor: const Color(0xff5FB7FF),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(91),
+        child: Container(
+          color: const Color(0xff5FB7FF),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 53,
+              bottom: 9,
+            ),
+            child: Stack(
+              alignment: Alignment.center, // 중앙 정렬
+              children: [
+                // 아이콘: 왼쪽에 고정
+                Positioned(
+                  left: 10,
+                  child: IconButton(
+                    padding: const EdgeInsets.all(0),
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 34,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                // 텍스트: 정가운데 배치
+                const Text(
+                  '새 일정 추가',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: -0.32,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.only(
+          bottom: 15,
+          top: 5,
+        ),
         child: Column(
           children: [
-            // 일정 입력
-            InputTitleWidget(
-              controller: titleController,
-              label: '일정을 입력하세요.',
-            ),
-            const SizedBox(height: 16),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // 일정 입력
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: InputTitleWidget(
+                        controller: titleController,
+                        label: '일정을 입력하세요.',
+                      ),
+                    ),
 
-            // 날짜 선택
-            DatePickerWidget(
-              onDateSelected: (date) {
-                setState(() {
-                  selectedDate = date;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
+                    const Divider(
+                      thickness: 2,
+                      color: Color(0xffE9E9E9),
+                      endIndent: 0,
+                    ),
 
-            // 시간 선택
-            TimePickerWidget(
-              onTimeSelected: (time) {
-                setState(() {
-                  selectedTime = time;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // 위치 입력 및 검색
-            GestureDetector(
-              onTap: () async {
-                // 장소 검색 화면으로 이동
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LocationSearchScreen(
-                      onLocationSelected: (selectedLocation) {
+                    // 날짜 선택
+                    DatePickerWidget(
+                      onDateSelected: (date) {
                         setState(() {
-                          location = selectedLocation['location']; // 건물명
-                          x = selectedLocation['x']; // 경도
-                          y = selectedLocation['y']; // 위도
+                          selectedDate = date;
                         });
                       },
                     ),
-                  ),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      location ?? '장소를 입력하세요.',
-                      style: TextStyle(
-                        color: location == null ? Colors.grey : Colors.black,
-                        fontSize: 16,
+
+                    const Divider(
+                      thickness: 2,
+                      color: Color(0xffE9E9E9),
+                      endIndent: 0,
+                    ),
+
+                    // 시간 선택
+                    TimePickerWidget(
+                      onTimeSelected: (time) {
+                        setState(() {
+                          selectedTime = time;
+                        });
+                      },
+                    ),
+
+                    const Divider(
+                      thickness: 2,
+                      color: Color(0xffE9E9E9),
+                      endIndent: 0,
+                    ),
+
+                    // 위치 입력 및 검색
+                    GestureDetector(
+                      onTap: () async {
+                        // 장소 검색 화면으로 이동
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LocationSearchScreen(
+                              onLocationSelected: (selectedLocation) {
+                                setState(() {
+                                  location =
+                                      selectedLocation['location']; // 건물명
+                                  x = selectedLocation['x']; // 경도
+                                  y = selectedLocation['y']; // 위도
+                                });
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 16),
+                        decoration: const BoxDecoration(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Icon(
+                              Icons.search,
+                              color: Color(0xff757575),
+                              size: 24,
+                            ),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              location ?? '장소',
+                              style: TextStyle(
+                                color: location == null
+                                    ? const Color(0xffD9D9D9)
+                                    : Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500,
+                                decoration: TextDecoration.underline,
+                                decorationColor: const Color(0xffD9D9D9),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    const Icon(Icons.search, color: Colors.blue),
+
+                    const Divider(
+                      thickness: 2,
+                      color: Color(0xffE9E9E9),
+                      endIndent: 0,
+                    ),
+
+                    // 교통수단 선택
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: TransportSelectorWidget(
+                        onTransportSelected: (trans) {
+                          setState(() {
+                            transport = trans;
+                          });
+                        },
+                      ),
+                    ),
+
+                    const Divider(
+                      thickness: 2,
+                      color: Color(0xffE9E9E9),
+                      endIndent: 0,
+                    ),
+
+                    // 확인 버튼
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
-            // 교통수단 선택
-            TransportSelectorWidget(
-              onTransportSelected: (trans) {
-                setState(() {
-                  transport = trans;
-                });
-              },
-            ),
-            const SizedBox(height: 32),
-
-            // 확인 버튼
-            ConfirmButtonWidget(
-              onPressed: onConfirm,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: ConfirmButtonWidget(
+                onPressed: onConfirm,
+              ),
             ),
           ],
         ),

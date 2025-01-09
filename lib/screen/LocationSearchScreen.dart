@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:projects/widgets/newAlarm/LocationItemWidget.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LocationSearchScreen extends StatefulWidget {
   final ValueChanged<Map<String, String>> onLocationSelected; // x, y 값 포함
@@ -49,18 +50,53 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
   }
 
   void showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('도착지 입력'),
-        backgroundColor: const Color(0xff5FB7FF),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(91),
+        child: Container(
+          color: const Color(0xff5FB7FF),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              top: 53,
+              bottom: 9,
+            ),
+            child: Stack(
+              alignment: Alignment.center, // 중앙 정렬
+              children: [
+                // 아이콘: 왼쪽에 고정
+                Positioned(
+                  left: 10,
+                  child: IconButton(
+                    padding: const EdgeInsets.all(0),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Colors.white,
+                      size: 34,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+                // 텍스트: 정가운데 배치
+                const Text(
+                  '도착지 입력',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: -0.32,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       body: Column(
@@ -72,17 +108,33 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
               controller: searchController,
               decoration: InputDecoration(
                 hintText: '장소를 입력하세요.',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    searchController.clear();
-                    setState(() {
-                      searchResults.clear();
-                    });
-                  },
+                hintStyle: const TextStyle(
+                  color: Color(0xffB3B3B3),
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: -0.32,
                 ),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Color(0xff757575),
+                  size: 30,
+                ),
+                suffixIcon: searchController.text.isNotEmpty // 조건부 렌더링
+                    ? IconButton(
+                        icon: const Icon(
+                          Icons.clear,
+                          color: Color(0xff757575),
+                          size: 30,
+                        ),
+                        onPressed: () {
+                          searchController.clear();
+                          setState(() {
+                            searchResults.clear();
+                          });
+                        },
+                      )
+                    : null,
               ),
               onChanged: (value) {
                 if (value.length > 1) {
@@ -96,27 +148,50 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : searchResults.isEmpty
-                ? const Center(child: Text('검색 결과가 없습니다.'))
-                : ListView.builder(
-              itemCount: searchResults.length,
-              itemBuilder: (context, index) {
-                final result = searchResults[index];
-                return LocationItemWidget(
-                  name: result['name'],
-                  address: result['address'],
-                  category: result['category'],
-                  onTap: () {
-                    // x, y, address 전달
-                    widget.onLocationSelected({
-                      'location': result['name'],
-                      'x': result['x'],
-                      'y': result['y'],
-                    });
-                    Navigator.pop(context); // 이전 화면으로 이동
-                  },
-                );
-              },
-            ),
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 150),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Align(
+                              alignment: Alignment.center,
+                              child: SvgPicture.asset(
+                                'assets/images/hugeicons_border-none-02.svg',
+                                width: 72,
+                              ),
+                            ),
+                            const Text(
+                              '일치하는 장소 정보가 없어요',
+                              style: TextStyle(
+                                color: Color(0xffD2D2D2),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                letterSpacing: -0.32,
+                              ),
+                            ),
+                          ],
+                        ))
+                    : ListView.builder(
+                        itemCount: searchResults.length,
+                        itemBuilder: (context, index) {
+                          final result = searchResults[index];
+                          return LocationItemWidget(
+                            name: result['name'],
+                            address: result['address'],
+                            category: result['category'],
+                            onTap: () {
+                              // x, y, address 전달
+                              widget.onLocationSelected({
+                                'location': result['name'],
+                                'x': result['x'],
+                                'y': result['y'],
+                              });
+                              Navigator.pop(context); // 이전 화면으로 이동
+                            },
+                          );
+                        },
+                      ),
           ),
         ],
       ),

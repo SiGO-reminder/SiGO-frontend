@@ -60,7 +60,11 @@ class _LocationInputWidgetState extends State<LocationInputWidget> {
                 color: selectedLocation == null ? Colors.grey : Colors.black,
               ),
             ),
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.grey,
+            ),
           ],
         ),
       ),
