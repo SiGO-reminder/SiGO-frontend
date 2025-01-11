@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 class LocationItemWidget extends StatelessWidget {
   final String name; // 장소 이름
   final String address; // 주소
-  final String category; // 카테고리
   final VoidCallback onTap; // 클릭 이벤트
 
   const LocationItemWidget({
     super.key,
     required this.name,
     required this.address,
-    required this.category,
     required this.onTap,
   });
 
@@ -39,14 +37,6 @@ class LocationItemWidget extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              category, // 카테고리
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.blueAccent,
               ),
             ),
           ],
