@@ -33,6 +33,10 @@ dependencies:
   flutter_slidable: ^3.1.1
   shared_preferences: ^2.2.0
   http: ^1.1.0
+  flutter_localizations:
+    sdk: flutter
+  flutter_svg: ^2.0.9
+  flutter_native_splash: ^2.4.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -62,6 +66,16 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/hugeicons_border-none-02.svg #위치를 못찾을때 아이콘
+    - assets/images/charm_menu-meatball.svg #  * * * 아이콘
+    - assets/images/iconamoon_profile-fill.svg # 사람아이콘
+    - assets/images/material-symbols_home-rounded.svg # 집아이콘
+    - assets/images/charm_menu-mini.svg # * * * 미니버전
+    - assets/images/bxs_trash.svg #쓰레기통
+    - assets/images/uil_calender.svg #캘린더
+    - assets/images/basil_stack-solid.svg #스택 아이콘
+    - assets/images/sigo.png #시고 아이콘
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -111,3 +125,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_native_splash:
+  android: true
+  ios: true
+  web: true
+  color: "#5FB7FF"
+  android_12:
+    color: "#5FB7FF"
+    image: assets/images/sigo.png
+

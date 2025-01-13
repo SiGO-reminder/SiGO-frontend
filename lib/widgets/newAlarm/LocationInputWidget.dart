@@ -17,48 +17,47 @@ class _LocationInputWidgetState extends State<LocationInputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () async {
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => LocationSearchScreen()),
-        );
-        if (result != null) {
-          setState(() {
-            selectedLocation = result['location']; // 건물명
-            selectedX = result['x'].toString(); // 경도를 문자열로 변환
-            selectedY = result['y'].toString(); // 위도를 문자열로 변환
-          });
+    return Material( // Material 위젯 추가
+      child: InkWell(
+        onTap: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LocationSearchScreen()),
+          );
+          if (result != null) {
+            setState(() {
+              selectedLocation = result['location']; // 건물명
+              selectedX = result['x'].toString(); // 경도를 문자열로 변환
+              selectedY = result['y'].toString(); // 위도를 문자열로 변환
+            });
 
-          // 디버깅 로그 추가
-          print('Location: $selectedLocation, X: $selectedX, Y: $selectedY');
-
-          // 상위 위젯으로 전달
-          widget.onLocationSelected({
-            'location': selectedLocation!,
-            'x': selectedX!,
-            'y': selectedY!,
-          });
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              selectedLocation ?? '장소를 선택하세요',
-              style: TextStyle(
-                fontSize: 16,
-                color: selectedLocation == null ? Colors.grey : Colors.black,
+            // 상위 위젯으로 데이터 전달
+            widget.onLocationSelected({
+              'location': selectedLocation!,
+              'x': selectedX!,
+              'y': selectedY!,
+            });
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                selectedLocation ?? '장소를 선택하세요',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: selectedLocation == null ? Colors.grey : Colors.black,
+                ),
               ),
-            ),
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-          ],
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            ],
+          ),
         ),
       ),
     );

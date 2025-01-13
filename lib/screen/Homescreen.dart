@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:projects/screen/NewAlarmScreen.dart';
-import 'package:projects/widgets/plus_button.dart';
-import 'package:projects/widgets/draggableScrollableSheet.dart';
-import 'package:projects/widgets/alarmBox.dart';
-import 'package:projects/widgets/dateCircle.dart';
+import 'package:projects/widgets/homeScreen/PlusbuttonWidget.dart';
+import 'package:projects/widgets/homeScreen/PopupMenuButtonWidget.dart';
+import 'package:projects/widgets/homeScreen/DraggableScrollableSheetWidget.dart';
+import 'package:projects/widgets/homeScreen/AlarmBoxWidget.dart';
+import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
+import 'package:flutter_svg/svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,19 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int sorting_criteria = 1; //이건 사용자에 따라 별도 설정
   @override
   Widget build(BuildContext context) {
-    var AlarmStack = SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            if (sorting_criteria == 2) const DateCircle(),
-            const AlarmBox(),
-            const AlarmBox(),
-            const AlarmBox(),
-          ],
-        ),
-      ),
-    );
     return Scaffold(
+      backgroundColor: const Color(0xffF4F5F7),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(91),
         child: Container(
@@ -48,72 +39,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     letterSpacing: -0.32,
                   ),
                 ),
-                PopupMenuButton(
-                  color: const Color(0xffF4F5F7),
-                  popUpAnimationStyle: AnimationStyle(
-                    curve: Easing.emphasizedDecelerate,
-                    duration: const Duration(seconds: 1),
-                  ),
-                  icon: const Icon(
-                    Icons.more_horiz_rounded,
-                    color: Color(0xffB3B3B3),
-                    size: 32,
-                  ),
-                  itemBuilder: (context) => <PopupMenuEntry>[
-                    const PopupMenuItem(
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.data_array_rounded,
-                          size: 20,
-                        ),
-                        title: Text(
-                          "Style",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w200,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      onTap: () {
-                        setState(() {
-                          sorting_criteria = 1;
-                        });
-                        print(sorting_criteria);
-                      },
-                      child: const ListTile(
-                        title: Text(
-                          "일정 기준",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      onTap: () {
-                        setState(() {
-                          sorting_criteria = 2;
-                        });
-                        print(sorting_criteria);
-                      },
-                      child: const ListTile(
-                        title: Text(
-                          "날짜 기준",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                PopupMenuWidget(
+                  onCriteriaSelected: (criteria) {
+                    setState(() {
+                      sorting_criteria = criteria;
+                    });
+                    print("Selected sorting criteria: $sorting_criteria");
+                  },
                 ),
               ],
             ),
@@ -122,7 +54,18 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          AlarmStack,
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  if (sorting_criteria == 2) const DateCircle(),
+                  const AlarmBox(),
+                  const AlarmBox(),
+                  const AlarmBox(),
+                ],
+              ),
+            ),
+          ),
           if (sorting_criteria == 1) const ScrollableSheet(),
         ],
       ),
@@ -156,17 +99,32 @@ class _HomeScreenState extends State<HomeScreen> {
           selectedFontSize: 0,
           selectedItemColor: const Color(0xff5FB7FF),
           unselectedItemColor: const Color(0xffB3B3B3),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.person, size: 45),
+              icon: SvgPicture.asset(
+                'assets/images/iconamoon_profile-fill.svg',
+                color: _selectedbottomNavigationIcon == 0
+                    ? const Color(0xff5FB7FF) // 선택된 상태
+                    : const Color(0xffB3B3B3), // 선택되지 않은 상태
+              ),
               label: 'Personal',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded, size: 45),
+              icon: SvgPicture.asset(
+                'assets/images/material-symbols_home-rounded.svg',
+                color: _selectedbottomNavigationIcon == 1
+                    ? const Color(0xff5FB7FF) // 선택된 상태
+                    : const Color(0xffB3B3B3), // 선택되지 않은 상태
+              ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.more_horiz_rounded, size: 45),
+              icon: SvgPicture.asset(
+                'assets/images/charm_menu-meatball.svg',
+                color: _selectedbottomNavigationIcon == 2
+                    ? const Color(0xff5FB7FF) // 선택된 상태
+                    : const Color(0xffB3B3B3), // 선택되지 않은 상태
+              ),
               label: 'SeeMore',
             ),
           ],
