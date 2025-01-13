@@ -1,55 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 import 'package:projects/widgets/newAlarm/LocationItemWidget.dart';
 
 class LocationSearchScreen extends StatefulWidget {
-  final ValueChanged<Map<String, String>> onLocationSelected; // x, y 값 포함
-
-  const LocationSearchScreen({super.key, required this.onLocationSelected});
-
   @override
   State<LocationSearchScreen> createState() => _LocationSearchScreenState();
 }
 
 class _LocationSearchScreenState extends State<LocationSearchScreen> {
   final TextEditingController searchController = TextEditingController();
-  List<Map<String, dynamic>> searchResults = []; // 검색 결과 저장
+  List<Map<String, dynamic>> searchResults = [];
   bool isLoading = false;
+  Timer? _debounce;
 
   // API 호출
   Future<void> performSearch(String query) async {
     if (query.isEmpty) return;
+
     setState(() {
       isLoading = true;
     });
 
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:3000/naver-map/search'),
+        Uri.parse('http://10.0.2.2:3000/api/v0/naver-map/search'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'address': query}),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final Map<String, dynamic> data = jsonDecode(response.body);
-        setState(() {
-          searchResults = List<Map<String, dynamic>>.from(data['data']);
-        });
+        if (data['data'] is List) {
+          setState(() {
+            searchResults = List<Map<String, dynamic>>.from(data['data']);
+          });
+        } else {
+          showErrorSnackBar('응답 데이터가 올바르지 않습니다.');
+        }
       } else {
-        showErrorSnackBar('검색 실패. 다시 시도하세요.');
+        showErrorSnackBar('검색 실패: ${response.statusCode}');
       }
     } catch (e) {
-      showErrorSnackBar('네트워크 오류가 발생했습니다.');
+      showErrorSnackBar('네트워크 오류: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   void showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -85,9 +95,16 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
                 ),
               ),
               onChanged: (value) {
-                if (value.length > 1) {
-                  performSearch(value);
-                }
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                _debounce = Timer(const Duration(milliseconds: 500), () {
+                  if (value.trim().length > 1) {
+                    performSearch(value);
+                  } else {
+                    setState(() {
+                      searchResults.clear();
+                    });
+                  }
+                });
               },
             ),
           ),
@@ -96,7 +113,12 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : searchResults.isEmpty
-                ? const Center(child: Text('검색 결과가 없습니다.'))
+                ? const Center(
+              child: Text(
+                '검색 결과가 없습니다.',
+                style: TextStyle(fontSize: 16),
+              ),
+            )
                 : ListView.builder(
               itemCount: searchResults.length,
               itemBuilder: (context, index) {
@@ -104,15 +126,12 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
                 return LocationItemWidget(
                   name: result['name'],
                   address: result['address'],
-                  category: result['category'],
                   onTap: () {
-                    // x, y, address 전달
-                    widget.onLocationSelected({
+                    Navigator.pop(context, {
                       'location': result['name'],
                       'x': result['x'],
                       'y': result['y'],
                     });
-                    Navigator.pop(context); // 이전 화면으로 이동
                   },
                 );
               },

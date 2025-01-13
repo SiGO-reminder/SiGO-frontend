@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:projects/screen/LocationSearchScreen.dart';
 
 class LocationInputWidget extends StatefulWidget {
-  final ValueChanged<Map<String, String>> onLocationSelected; // x, y 포함 콜백
+  final ValueChanged<Map<String, String>> onLocationSelected;
 
   const LocationInputWidget({super.key, required this.onLocationSelected});
 
@@ -11,37 +11,35 @@ class LocationInputWidget extends StatefulWidget {
 }
 
 class _LocationInputWidgetState extends State<LocationInputWidget> {
-  String? selectedLocation; // 사용자에게 보여줄 건물명
-  String? selectedX; // 경도
-  String? selectedY; // 위도
+  String? selectedLocation; // 선택된 장소 이름
+  String? selectedX; // 선택된 경도
+  String? selectedY; // 선택된 위도
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        // 위치 검색 화면으로 이동
         final result = await Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => LocationSearchScreen(
-              onLocationSelected: (location) {
-                setState(() {
-                  // 선택한 위치 정보 저장
-                  selectedLocation = location['location']; // 건물명
-                  selectedX = location['x']; // 경도
-                  selectedY = location['y']; // 위도
-                });
-
-                // 콜백 호출하여 부모 위젯에 전달
-                widget.onLocationSelected({
-                  'location': location['location']!,
-                  'x': location['x']!,
-                  'y': location['y']!,
-                });
-              },
-            ),
-          ),
+          MaterialPageRoute(builder: (context) => LocationSearchScreen()),
         );
+        if (result != null) {
+          setState(() {
+            selectedLocation = result['location']; // 건물명
+            selectedX = result['x'].toString(); // 경도를 문자열로 변환
+            selectedY = result['y'].toString(); // 위도를 문자열로 변환
+          });
+
+          // 디버깅 로그 추가
+          print('Location: $selectedLocation, X: $selectedX, Y: $selectedY');
+
+          // 상위 위젯으로 전달
+          widget.onLocationSelected({
+            'location': selectedLocation!,
+            'x': selectedX!,
+            'y': selectedY!,
+          });
+        }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
@@ -52,7 +50,6 @@ class _LocationInputWidgetState extends State<LocationInputWidget> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // 선택한 위치 표시 (없을 시 기본 문구)
             Text(
               selectedLocation ?? '장소를 선택하세요',
               style: TextStyle(
