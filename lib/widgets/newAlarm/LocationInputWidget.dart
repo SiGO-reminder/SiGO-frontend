@@ -17,7 +17,8 @@ class _LocationInputWidgetState extends State<LocationInputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Material( // Material 위젯 추가
+    return Material(
+      // Material 위젯 추가
       child: InkWell(
         onTap: () async {
           final result = await Navigator.push(

@@ -6,6 +6,7 @@ import 'package:projects/widgets/homeScreen/DraggableScrollableSheetWidget.dart'
 import 'package:projects/widgets/homeScreen/AlarmBoxWidget.dart';
 import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart'; //로컬타임임
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,9 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  '2024/11/30',
-                  style: TextStyle(
+                Text(
+                  DateFormat('yyyy/MM/dd').format(DateTime.now()),
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,

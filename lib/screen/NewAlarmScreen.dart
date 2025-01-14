@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:projects/widgets/newAlarm/InputTitleWidget.dart';
 import 'package:projects/widgets/newAlarm/DatePickerWidget.dart';
 import 'package:projects/widgets/newAlarm/TimePickerWidget.dart';
-import 'package:projects/widgets/newAlarm/LocationInputWidget.dart';
 import 'package:projects/widgets/newAlarm/TransportSelectorWidget.dart';
 import 'package:projects/widgets/newAlarm/ConfirmButtonWidget.dart';
 import 'package:projects/utils/DataStorage.dart';
@@ -163,6 +162,7 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
 
                     // 날짜 선택
                     DatePickerWidget(
+                      selectedDate: selectedDate,
                       onDateSelected: (date) {
                         setState(() {
                           selectedDate = date;
@@ -178,6 +178,7 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
 
                     // 시간 선택
                     TimePickerWidget(
+                      selectedTime: selectedTime,
                       onTimeSelected: (time) {
                         setState(() {
                           selectedTime = time;
@@ -196,7 +197,9 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                       onTap: () async {
                         final result = await Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => LocationSearchScreen()),
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const LocationSearchScreen()),
                         );
                         if (result != null) {
                           setState(() {
@@ -206,15 +209,17 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                           });
                         }
                       },
-                      child: Material( // Material로 감싸기
+                      child: Material(
+                        // Material로 감싸기
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                          decoration: const BoxDecoration(),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 17, vertical: 16),
+                          decoration: const BoxDecoration(color: Colors.white),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               const Icon(
-                                Icons.search,
+                                Icons.place_outlined,
                                 color: Color(0xff757575),
                                 size: 24,
                               ),
@@ -222,7 +227,9 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                               Text(
                                 location ?? '장소',
                                 style: TextStyle(
-                                  color: location == null ? const Color(0xffD9D9D9) : Colors.black,
+                                  color: location == null
+                                      ? const Color(0xffD9D9D9)
+                                      : Colors.black,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w500,
                                   decoration: TextDecoration.underline,
@@ -267,7 +274,8 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: ConfirmButtonWidget(
-                onPressed: onConfirm,
+                //확인차 날짜 조건만 넣음
+                onPressed: (selectedDate != null) ? onConfirm : null,
               ),
             ),
           ],

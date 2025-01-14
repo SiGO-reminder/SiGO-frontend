@@ -1,26 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TimePickerWidget extends StatelessWidget {
   final ValueChanged<TimeOfDay> onTimeSelected;
+  final TimeOfDay? selectedTime;
 
-  const TimePickerWidget({super.key, required this.onTimeSelected});
+  const TimePickerWidget({
+    super.key,
+    required this.onTimeSelected,
+    this.selectedTime,
+  });
 
   @override
   Widget build(BuildContext context) {
+    String timeString() {
+      if (selectedTime == null) {
+        return '시간 선택1';
+      } else {
+        final now = DateTime.now();
+        final dt = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          selectedTime!.hour,
+          selectedTime!.minute,
+        );
+        // "hh:mm a" → 예: 07:05 PM
+        return DateFormat('hh:mm a').format(dt);
+      }
+    }
+
     return ListTile(
       leading: const Icon(
         Icons.access_time,
         color: Color(0xff757575),
         size: 24,
       ),
-      title: const Text(
-        '시간',
+      title: Text(
+        timeString(),
         style: TextStyle(
-          color: Color(0xffD9D9D9),
+          color: selectedTime == null ? const Color(0xffD9D9D9) : Colors.black,
           fontSize: 20,
           fontWeight: FontWeight.w400,
           decoration: TextDecoration.underline,
-          decorationColor: Color(0xffD9D9D9),
+          decorationColor: const Color(0xffD9D9D9),
         ),
       ),
       onTap: () async {
