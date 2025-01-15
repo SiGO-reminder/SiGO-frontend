@@ -32,9 +32,9 @@ class DatePickerWidget extends StatelessWidget {
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
           context: context,
-          initialDate: selectedDate ?? DateTime.now(),
-          firstDate: DateTime(2020),
-          lastDate: DateTime(2100),
+          initialDate: DateTime.now(),
+          firstDate: DateTime.now(),
+          lastDate: DateTime(DateTime.now().year + 10),
           builder: (context, child) {
             return Theme(
               data: ThemeData(

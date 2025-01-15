@@ -17,7 +17,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedbottomNavigationIcon = 1;
-  int sorting_criteria = 1; //이건 사용자에 따라 별도 설정
+  int sorting_criteria = 1; // 사용자별 정렬 기준
+  late String currentDate; // 오늘 날짜를 저장할 변수
+
+  @override
+  void initState() {
+    super.initState();
+    // 오늘 날짜 가져오기
+    currentDate = DateFormat('yyyy/MM/dd').format(DateTime.now());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,8 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // 오늘 날짜 표시
                 Text(
-                  DateFormat('yyyy/MM/dd').format(DateTime.now()),
+                  currentDate,
                   style: const TextStyle(
                     color: Colors.black,
                     fontSize: 16,
@@ -40,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     letterSpacing: -0.32,
                   ),
                 ),
+                // 팝업 메뉴
                 PopupMenuWidget(
                   onCriteriaSelected: (criteria) {
                     setState(() {
@@ -72,7 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: plus_Button(
         onPressed: () {
-          // print('new_alarm으로 이동');
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const NewAlarmScreen()),
@@ -80,17 +90,14 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       bottomNavigationBar: SizedBox(
-        // margin: const EdgeInsets.symmetric(horizontal: 20),
         height: 69,
         child: BottomNavigationBar(
           currentIndex: _selectedbottomNavigationIcon,
           onTap: (index) {
-            setState(
-              () {
-                _selectedbottomNavigationIcon = index;
-                print(index);
-              },
-            );
+            setState(() {
+              _selectedbottomNavigationIcon = index;
+              print(index);
+            });
           },
           type: BottomNavigationBarType.fixed,
           elevation: 0,
@@ -105,8 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: SvgPicture.asset(
                 'assets/images/iconamoon_profile-fill.svg',
                 color: _selectedbottomNavigationIcon == 0
-                    ? const Color(0xff5FB7FF) // 선택된 상태
-                    : const Color(0xffB3B3B3), // 선택되지 않은 상태
+                    ? const Color(0xff5FB7FF)
+                    : const Color(0xffB3B3B3),
               ),
               label: 'Personal',
             ),
@@ -114,8 +121,8 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: SvgPicture.asset(
                 'assets/images/material-symbols_home-rounded.svg',
                 color: _selectedbottomNavigationIcon == 1
-                    ? const Color(0xff5FB7FF) // 선택된 상태
-                    : const Color(0xffB3B3B3), // 선택되지 않은 상태
+                    ? const Color(0xff5FB7FF)
+                    : const Color(0xffB3B3B3),
               ),
               label: 'Home',
             ),
@@ -123,8 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: SvgPicture.asset(
                 'assets/images/charm_menu-meatball.svg',
                 color: _selectedbottomNavigationIcon == 2
-                    ? const Color(0xff5FB7FF) // 선택된 상태
-                    : const Color(0xffB3B3B3), // 선택되지 않은 상태
+                    ? const Color(0xff5FB7FF)
+                    : const Color(0xffB3B3B3),
               ),
               label: 'SeeMore',
             ),
