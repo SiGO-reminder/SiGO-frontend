@@ -1,20 +1,24 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class AlarmBoxWidget extends StatefulWidget {
-  final String rawTime; // 예: '15:15' 형식의 원본 시간
-  final String location; // 예: '반지하 돈부리'
-  final String title; // 예: '저녁 약속'
-  final VoidCallback onDelete; // 삭제 콜백
+  final String rawTime;
+  final String location;
+  final String title;
+  final bool isOn; // 초기 스위치 상태
+  final VoidCallback onDelete;
+  final ValueChanged<bool> onToggle; // 스위치 상태 변경 콜백
 
   const AlarmBoxWidget({
     super.key,
     required this.rawTime,
     required this.location,
     required this.title,
+    required this.isOn,
     required this.onDelete,
+    required this.onToggle,
   });
 
   @override
@@ -22,24 +26,28 @@ class AlarmBoxWidget extends StatefulWidget {
 }
 
 class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
-  bool isChecked = true;
+  late bool isChecked;
+
+  @override
+  void initState() {
+    super.initState();
+    isChecked = widget.isOn; // 초기 상태 설정
+  }
 
   String getFormattedTime(String rawTime) {
-    // "오전 3:15" 또는 "오후 6:00"을 24시간 형식으로 변환
     final isAfternoon = rawTime.contains('오후');
     final timeParts = rawTime.replaceAll(RegExp(r'[^\d:]'), '').split(':');
     int hour = int.parse(timeParts[0]);
     String minute = timeParts[1];
 
     if (isAfternoon && hour != 12) {
-      hour += 12; // 오후일 경우 12시간 추가
+      hour += 12;
     } else if (!isAfternoon && hour == 12) {
-      hour = 0; // 오전 12시는 0시로 변경
+      hour = 0;
     }
 
-    // 24시간 형식을 12시간 형식으로 변환
     String period = hour >= 12 ? 'PM' : 'AM';
-    hour = hour % 12 == 0 ? 12 : hour % 12; // 0은 12로 변환
+    hour = hour % 12 == 0 ? 12 : hour % 12;
     return '${hour.toString().padLeft(2, '0')}:$minute $period';
   }
 
@@ -83,7 +91,6 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
             height: 83,
             child: Stack(
               children: [
-                // 알림 상자 배경
                 Container(
                   width: double.infinity,
                   height: 83,
@@ -94,37 +101,30 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
                     ),
                   ),
                 ),
-                // 시각
-                // 시각 (시간 / AM, PM)
                 Positioned(
                   left: 14,
                   top: 9,
                   child: Text(
-                    formattedTime.split(' ')[0], // 시간 부분 (예: "08:00")
+                    formattedTime.split(' ')[0],
                     style: TextStyle(
-                      color: (isChecked == true)
-                          ? const Color(0xFF5EB6FF)
-                          : const Color(0xffA9A9A9),
+                      color: isChecked ? const Color(0xFF5EB6FF) : const Color(0xffA9A9A9),
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
                 Positioned(
-                  left: 105, // 위치 조정
-                  top: 24, // 기존 디자인에 맞춘 위치
+                  left: 105,
+                  top: 24,
                   child: Text(
-                    formattedTime.split(' ')[1], // AM/PM 부분 (예: "PM")
+                    formattedTime.split(' ')[1],
                     style: TextStyle(
-                      color: (isChecked == true)
-                          ? const Color(0xFF5EB6FF)
-                          : const Color(0xffA9A9A9),
-                      fontSize: 16, // 작은 폰트 크기
+                      color: isChecked ? const Color(0xFF5EB6FF) : const Color(0xffA9A9A9),
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-                // 장소 및 제목
                 Positioned(
                   left: 13.5,
                   top: 47,
@@ -167,7 +167,6 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
                     ],
                   ),
                 ),
-                // 스위치
                 Positioned(
                   right: 16,
                   top: 25,
@@ -177,6 +176,7 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
                     trackColor: const Color(0xFF757575),
                     onChanged: (bool value) {
                       setState(() => isChecked = value);
+                      widget.onToggle(value); // 상태 변경 콜백 호출
                     },
                   ),
                 ),

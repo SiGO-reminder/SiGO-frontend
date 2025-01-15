@@ -36,11 +36,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> toggleAlarmStatus(int index, bool isOn) async {
+    await DataStorage.updateAlarmStatus(index, isOn); // 상태 저장
+    setState(() {
+      alarms[index]['isOn'] = isOn; // UI 업데이트
+    });
+  }
+
   Future<void> deleteAlarm(int index) async {
     await DataStorage.deleteAlarm(index); // 데이터베이스에서 알람 삭제
-    setState(() {
-      alarms.removeAt(index); // UI에서 알람 제거
-    });
+    loadAlarms(); // 삭제 후 데이터 새로고침
   }
 
   @override
@@ -82,18 +87,20 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  if (sortingCriteria == 2) const DateCircle(),
-                  ...alarms.map((alarm) => AlarmBoxWidget(
-                    rawTime: alarm['time'] ?? "00:00", // 24시간 형식 시간
-                    location: alarm['location'] ?? "Unknown Location", // 기본값 설정
-                    title: alarm['title'] ?? "No Title", // 기본값 설정
-                    onDelete: () => deleteAlarm(alarms.indexOf(alarm)), // 삭제 콜백
-                  )),
-                ],
-              ),
+            child: ListView.builder(
+              itemCount: alarms.length,
+              itemBuilder: (context, index) {
+                final alarm = alarms[index];
+                return AlarmBoxWidget(
+                  key: ValueKey(alarm['time'] + alarm['title']), // 고유 키 추가
+                  rawTime: alarm['time'] ?? "00:00",
+                  location: alarm['location'] ?? "Unknown Location",
+                  title: alarm['title'] ?? "No Title",
+                  isOn: alarm['isOn'] ?? true,
+                  onDelete: () => deleteAlarm(index),
+                  onToggle: (isOn) => toggleAlarmStatus(index, isOn),
+                );
+              },
             ),
           ),
           if (sortingCriteria == 1) const ScrollableSheet(),
@@ -104,10 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const NewAlarmScreen()),
-          ).then((_) {
-            // NewAlarmScreen에서 돌아올 때 알람 리스트를 새로고침
-            loadAlarms();
-          });
+          ).then((_) => loadAlarms());
         },
       ),
       bottomNavigationBar: SizedBox(
