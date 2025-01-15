@@ -4,8 +4,11 @@ class InputTitleWidget extends StatelessWidget {
   final TextEditingController controller;
   final String label;
 
-  const InputTitleWidget(
-      {super.key, required this.controller, required this.label});
+  const InputTitleWidget({
+    super.key,
+    required this.controller,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {

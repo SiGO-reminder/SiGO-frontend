@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DatePickerWidget extends StatelessWidget {
   final ValueChanged<DateTime> onDateSelected;
+  final DateTime? selectedDate;
 
-  const DatePickerWidget({super.key, required this.onDateSelected});
+  const DatePickerWidget({
+    super.key,
+    required this.onDateSelected,
+    this.selectedDate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,10 +19,12 @@ class DatePickerWidget extends StatelessWidget {
         color: Color(0xff757575),
         size: 24,
       ),
-      title: const Text(
-        '날짜 선택',
+      title: Text(
+        selectedDate == null
+            ? '날짜 선택'
+            : DateFormat('yyyy/MM/dd').format(selectedDate!),
         style: TextStyle(
-          color: Color(0xffD9D9D9),
+          color: selectedDate == null ? const Color(0xffD9D9D9) : Colors.black,
           fontSize: 20,
           fontWeight: FontWeight.w400,
         ),
@@ -32,10 +40,10 @@ class DatePickerWidget extends StatelessWidget {
               data: ThemeData(
                 useMaterial3: true,
                 datePickerTheme: const DatePickerThemeData(
-                  backgroundColor: Colors.white, // 배경색
-                  headerBackgroundColor: Color(0xff5EB6FF), // 헤더 배경색
-                  headerForegroundColor: Colors.white, // 헤더 텍스트 색상
-                  surfaceTintColor: Colors.transparent, // 색상 전환 비활성화
+                  backgroundColor: Colors.white,
+                  headerBackgroundColor: Color(0xff5EB6FF),
+                  headerForegroundColor: Colors.white,
+                  surfaceTintColor: Colors.transparent,
                   yearStyle: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
