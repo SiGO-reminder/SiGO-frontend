@@ -4,9 +4,10 @@ import 'package:projects/widgets/homeScreen/PlusbuttonWidget.dart';
 import 'package:projects/widgets/homeScreen/PopupMenuButtonWidget.dart';
 import 'package:projects/widgets/homeScreen/DraggableScrollableSheetWidget.dart';
 import 'package:projects/widgets/homeScreen/AlarmBoxWidget.dart';
-import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart'; //로컬타임임
+import 'package:intl/intl.dart';
+import 'package:projects/utils/DataStorage.dart';
+import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,14 +18,29 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedbottomNavigationIcon = 1;
-  int sorting_criteria = 1; // 사용자별 정렬 기준
+  int sortingCriteria = 1; // 사용자별 정렬 기준
   late String currentDate; // 오늘 날짜를 저장할 변수
+  List<Map<String, dynamic>> alarms = []; // 알람 데이터 리스트
 
   @override
   void initState() {
     super.initState();
-    // 오늘 날짜 가져오기
     currentDate = DateFormat('yyyy/MM/dd').format(DateTime.now());
+    loadAlarms(); // 저장된 알람 데이터 로드
+  }
+
+  Future<void> loadAlarms() async {
+    List<Map<String, dynamic>> loadedAlarms = await DataStorage.loadAlarms();
+    setState(() {
+      alarms = loadedAlarms;
+    });
+  }
+
+  Future<void> deleteAlarm(int index) async {
+    await DataStorage.deleteAlarm(index); // 데이터베이스에서 알람 삭제
+    setState(() {
+      alarms.removeAt(index); // UI에서 알람 제거
+    });
   }
 
   @override
@@ -54,9 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 PopupMenuWidget(
                   onCriteriaSelected: (criteria) {
                     setState(() {
-                      sorting_criteria = criteria;
+                      sortingCriteria = criteria;
                     });
-                    print("Selected sorting criteria: $sorting_criteria");
                   },
                 ),
               ],
@@ -70,15 +85,18 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  if (sorting_criteria == 2) const DateCircle(),
-                  const AlarmBox(),
-                  const AlarmBox(),
-                  const AlarmBox(),
+                  if (sortingCriteria == 2) const DateCircle(),
+                  ...alarms.map((alarm) => AlarmBoxWidget(
+                    rawTime: alarm['time'] ?? "00:00", // 24시간 형식 시간
+                    location: alarm['location'] ?? "Unknown Location", // 기본값 설정
+                    title: alarm['title'] ?? "No Title", // 기본값 설정
+                    onDelete: () => deleteAlarm(alarms.indexOf(alarm)), // 삭제 콜백
+                  )),
                 ],
               ),
             ),
           ),
-          if (sorting_criteria == 1) const ScrollableSheet(),
+          if (sortingCriteria == 1) const ScrollableSheet(),
         ],
       ),
       floatingActionButton: plus_Button(
@@ -86,7 +104,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const NewAlarmScreen()),
-          );
+          ).then((_) {
+            // NewAlarmScreen에서 돌아올 때 알람 리스트를 새로고침
+            loadAlarms();
+          });
         },
       ),
       bottomNavigationBar: SizedBox(
@@ -96,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: (index) {
             setState(() {
               _selectedbottomNavigationIcon = index;
-              print(index);
             });
           },
           type: BottomNavigationBarType.fixed,

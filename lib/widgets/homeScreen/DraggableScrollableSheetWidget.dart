@@ -191,9 +191,9 @@ class nextCalender extends StatelessWidget {
         iconColor: Colors.blue,
         collapsedBackgroundColor: Colors.white,
         children: [
-          AlarmBox(),
-          AlarmBox(),
-          AlarmBox(),
+          //AlarmBox(),
+          //AlarmBox(),
+          //AlarmBox(),
         ],
       ),
     );
