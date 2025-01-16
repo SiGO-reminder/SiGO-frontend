@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projects/screen/NewAlarmScreen.dart';
+import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
 import 'package:projects/widgets/homeScreen/PlusbuttonWidget.dart';
 import 'package:projects/widgets/homeScreen/PopupMenuButtonWidget.dart';
 import 'package:projects/widgets/homeScreen/DraggableScrollableSheetWidget.dart';
@@ -7,7 +8,6 @@ import 'package:projects/widgets/homeScreen/AlarmBoxWidget.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:projects/utils/DataStorage.dart';
-import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -86,22 +86,48 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
+          if (sortingCriteria == 2) const DateCircle(),
           SafeArea(
-            child: ListView.builder(
-              itemCount: alarms.length,
-              itemBuilder: (context, index) {
-                final alarm = alarms[index];
-                return AlarmBoxWidget(
-                  key: ValueKey(alarm['time'] + alarm['title']), // 고유 키 추가
-                  rawTime: alarm['time'] ?? "00:00",
-                  location: alarm['location'] ?? "Unknown Location",
-                  title: alarm['title'] ?? "No Title",
-                  isOn: alarm['isOn'] ?? true,
-                  onDelete: () => deleteAlarm(index),
-                  onToggle: (isOn) => toggleAlarmStatus(index, isOn),
-                );
-              },
-            ),
+            child: alarms.isEmpty
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Image.asset('assets/images/page.png'),
+                      ),
+                      const Text(
+                        "오늘의 일정이 없어요!",
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Color(0xffB3B3B3),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Text(
+                        "+ 버튼을 눌러 새 일정을 추가해보세요.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xffB3B3B3),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  )
+                : ListView.builder(
+                    itemCount: alarms.length,
+                    itemBuilder: (context, index) {
+                      final alarm = alarms[index];
+                      return AlarmBoxWidget(
+                        key: ValueKey(alarm['time'] + alarm['title']), // 고유 키
+                        rawTime: alarm['time'] ?? "00:00",
+                        location: alarm['location'] ?? "Unknown Location",
+                        title: alarm['title'] ?? "No Title",
+                        isOn: alarm['isOn'] ?? true,
+                        onDelete: () => deleteAlarm(index),
+                        onToggle: (isOn) => toggleAlarmStatus(index, isOn),
+                      );
+                    },
+                  ),
           ),
           if (sortingCriteria == 1) const ScrollableSheet(),
         ],

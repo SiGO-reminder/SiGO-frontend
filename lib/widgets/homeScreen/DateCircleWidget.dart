@@ -50,7 +50,7 @@ class _DateCircleState extends State<DateCircle> {
                     // 선택 여부에 따라 글자색 변경
                     color: isSelected ? Colors.white : Colors.black,
                     fontSize: 20,
-                    fontFamily: 'Pretendard',
+
                     fontWeight: FontWeight.w400,
                     letterSpacing: -0.4,
                   ),

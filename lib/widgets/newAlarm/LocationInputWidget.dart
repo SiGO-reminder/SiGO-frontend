@@ -23,7 +23,8 @@ class _LocationInputWidgetState extends State<LocationInputWidget> {
         onTap: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => LocationSearchScreen()),
+            MaterialPageRoute(
+                builder: (context) => const LocationSearchScreen()),
           );
           if (result != null) {
             setState(() {
