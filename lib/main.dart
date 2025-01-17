@@ -22,7 +22,6 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       theme: ThemeData(
         scaffoldBackgroundColor: const Color(0xffF4F5F7),
-        fontFamily: 'Pretendard',
       ),
       home: const HomeScreen(),
       localizationsDelegates: const [

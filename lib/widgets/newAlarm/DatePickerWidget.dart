@@ -60,9 +60,7 @@ class DatePickerWidget extends StatelessWidget {
           },
         );
 
-        if (pickedDate != null) {
-          onDateSelected(pickedDate);
-        }
+        onDateSelected(pickedDate!);
       },
     );
   }
