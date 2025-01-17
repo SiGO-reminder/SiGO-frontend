@@ -86,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          if (sortingCriteria == 2) const DateCircle(),
           SafeArea(
             child: alarms.isEmpty
                 ? Column(
@@ -114,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   )
                 : ListView.builder(
+                    padding: sortingCriteria == 2
+                        ? const EdgeInsets.only(top: 50)
+                        : EdgeInsets.zero,
                     itemCount: alarms.length,
                     itemBuilder: (context, index) {
                       final alarm = alarms[index];
@@ -130,6 +132,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
           ),
           if (sortingCriteria == 1) const ScrollableSheet(),
+          if (sortingCriteria == 2)
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: DateCircle(),
+            ),
         ],
       ),
       floatingActionButton: plus_Button(
