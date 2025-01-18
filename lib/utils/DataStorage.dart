@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 class DataStorage {
   static const String alarmKey = 'alarms';
@@ -18,7 +19,7 @@ class DataStorage {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, dynamic> alarmData = {
       "title": title,
-      "date": date,
+      "date": DateFormat('yyyy-MM-dd').format(DateTime.parse(date)), // 날짜 형식 통일
       "time": time,
       "location": location,
       "transport": transport,
@@ -39,6 +40,7 @@ class DataStorage {
     return alarms.map((alarm) {
       Map<String, dynamic> decodedAlarm = jsonDecode(alarm);
       return {
+        "date": decodedAlarm["date"] ?? "1970-01-01",
         "time": decodedAlarm["time"] ?? "00:00",
         "location": decodedAlarm["location"] ?? "Unknown Location",
         "title": decodedAlarm["title"] ?? "No Title",

@@ -80,7 +80,7 @@ class ScrollableSheet extends StatelessWidget {
                             spreadRadius: 0,
                             blurRadius: 5.0,
                             offset:
-                                Offset(0, -0.01), // changes position of shadow
+                            Offset(0, -0.01), // changes position of shadow
                           ),
                         ],
                       ),
@@ -110,7 +110,7 @@ class ScrollableSheet extends StatelessWidget {
                             spreadRadius: 0,
                             blurRadius: 5.0,
                             offset:
-                                Offset(5, -0.01), // changes position of shadow
+                            Offset(5, -0.01), // changes position of shadow
                           ),
                         ],
                       ),
@@ -127,7 +127,7 @@ class ScrollableSheet extends StatelessWidget {
                   children: [
                     Row(
                       crossAxisAlignment:
-                          CrossAxisAlignment.start, // Row 내에서 Text를 상단에 정렬
+                      CrossAxisAlignment.start, // Row 내에서 Text를 상단에 정렬
                       children: [
                         Padding(
                           padding: EdgeInsets.fromLTRB(23, 13, 0, 1),
