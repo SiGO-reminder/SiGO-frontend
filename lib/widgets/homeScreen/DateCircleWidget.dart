@@ -10,7 +10,11 @@ class DateCircle extends StatefulWidget {
 class _DateCircleState extends State<DateCircle> {
   int _selectedIndex = 0;
 
-  final List<int> _days = [30, 1, 2, 3, 4];
+  final List<int> _days = List.generate(
+    5,
+    (index) => DateTime.now().add(Duration(days: index)).day,
+  );
+  //list 생성 = [오늘날짜, ()+1, ()+2, ()+3, ()+4]
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +30,7 @@ class _DateCircleState extends State<DateCircle> {
           return GestureDetector(
             onTap: () {
               setState(() {
-                _selectedIndex = index; // 선택된 인덱스 갱신
+                _selectedIndex = index;
               });
             },
             child: Container(

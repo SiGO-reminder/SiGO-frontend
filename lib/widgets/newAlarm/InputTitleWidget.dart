@@ -24,6 +24,7 @@ class InputTitleWidget extends StatelessWidget {
         labelText: label,
         labelStyle: const TextStyle(
           color: Color(0xffD9D9D9),
+          letterSpacing: -0.64,
           fontSize: 20,
           fontWeight: FontWeight.w400,
         ),

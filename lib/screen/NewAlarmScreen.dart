@@ -4,6 +4,7 @@ import 'package:projects/widgets/newAlarm/DatePickerWidget.dart';
 import 'package:projects/widgets/newAlarm/TimePickerWidget.dart';
 import 'package:projects/widgets/newAlarm/TransportSelectorWidget.dart';
 import 'package:projects/widgets/newAlarm/ConfirmButtonWidget.dart';
+import 'package:projects/widgets/newAlarm/PrepareTime.dart';
 import 'package:projects/utils/DataStorage.dart';
 import 'package:projects/screen/LocationSearchScreen.dart'; // 장소 검색 추가
 
@@ -180,9 +181,11 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                     TimePickerWidget(
                       selectedTime: selectedTime,
                       onTimeSelected: (time) {
-                        setState(() {
-                          selectedTime = time;
-                        });
+                        setState(
+                          () {
+                            selectedTime = time;
+                          },
+                        );
                       },
                     ),
 
@@ -233,7 +236,10 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                                   fontSize: 20,
                                   fontWeight: FontWeight.w500,
                                   decoration: TextDecoration.underline,
-                                  decorationColor: const Color(0xffD9D9D9),
+                                  decorationColor: location == null
+                                      ? const Color(0xffD9D9D9)
+                                      : Colors.black,
+                                  letterSpacing: -0.64,
                                 ),
                               ),
                             ],
@@ -266,6 +272,11 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                       endIndent: 0,
                     ),
 
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(17, 2, 0, 0),
+                      child: PreparationTime(),
+                    ),
+
                     // 확인 버튼
                   ],
                 ),
@@ -275,7 +286,12 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: ConfirmButtonWidget(
                 //확인차 날짜 조건만 넣음
-                onPressed: (selectedDate != null) ? onConfirm : null,
+                onPressed: (selectedDate != null) &&
+                        (selectedTime != null) &&
+                        (location != null) &&
+                        (transport != null)
+                    ? onConfirm
+                    : null,
               ),
             ),
           ],

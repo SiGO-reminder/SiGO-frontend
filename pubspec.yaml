@@ -77,8 +77,9 @@ flutter:
     - assets/images/uil_calender.svg #캘린더
     - assets/images/basil_stack-solid.svg #스택 아이콘
     - assets/images/sigo2.png #시고 아이콘
-    - assets/images/page.png
+    - assets/images/page.png # 알람이 없을때
     - assets\images\sigo1.png
+    - assets\images\fluent-mdl2_cancel.svg # 알람끄기 버튼
 
   # To add assets to your application, add an assets section, like this:
   # assets:

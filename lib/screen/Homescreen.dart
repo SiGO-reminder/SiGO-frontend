@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projects/screen/NewAlarmScreen.dart';
+import 'package:projects/screen/AlarmSoundScreen.dart';
 import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
 import 'package:projects/widgets/homeScreen/PlusbuttonWidget.dart';
 import 'package:projects/widgets/homeScreen/PopupMenuButtonWidget.dart';
@@ -33,7 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
     List<Map<String, dynamic>> loadedAlarms = await DataStorage.loadAlarms();
     String today = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 오늘 날짜 형식
     setState(() {
-      alarms = loadedAlarms.where((alarm) => alarm['date'] == today).toList(); // 오늘의 알람 필터링
+      alarms = loadedAlarms
+          .where((alarm) => alarm['date'] == today)
+          .toList(); // 오늘의 알람 필터링
     });
   }
 
@@ -90,47 +93,47 @@ class _HomeScreenState extends State<HomeScreen> {
           SafeArea(
             child: alarms.isEmpty
                 ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Image.asset('assets/images/page.png'),
-                ),
-                const Text(
-                  "오늘의 일정이 없어요!",
-                  style: TextStyle(
-                    fontSize: 24,
-                    color: Color(0xffB3B3B3),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Text(
-                  "+ 버튼을 눌러 새 일정을 추가해보세요.",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xffB3B3B3),
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            )
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Image.asset('assets/images/page.png'),
+                      ),
+                      const Text(
+                        "오늘의 일정이 없어요!",
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Color(0xffB3B3B3),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const Text(
+                        "+ 버튼을 눌러 새 일정을 추가해보세요.",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xffB3B3B3),
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  )
                 : ListView.builder(
-              padding: sortingCriteria == 2
-                  ? const EdgeInsets.only(top: 50)
-                  : EdgeInsets.zero,
-              itemCount: alarms.length,
-              itemBuilder: (context, index) {
-                final alarm = alarms[index];
-                return AlarmBoxWidget(
-                  key: ValueKey(alarm['time'] + alarm['title']), // 고유 키
-                  rawTime: alarm['time'] ?? "00:00",
-                  location: alarm['location'] ?? "Unknown Location",
-                  title: alarm['title'] ?? "No Title",
-                  isOn: alarm['isOn'] ?? true,
-                  onDelete: () => deleteAlarm(index),
-                  onToggle: (isOn) => toggleAlarmStatus(index, isOn),
-                );
-              },
-            ),
+                    padding: sortingCriteria == 2
+                        ? const EdgeInsets.only(top: 58)
+                        : const EdgeInsets.only(top: 8),
+                    itemCount: alarms.length,
+                    itemBuilder: (context, index) {
+                      final alarm = alarms[index];
+                      return AlarmBoxWidget(
+                        key: ValueKey(alarm['time'] + alarm['title']), // 고유 키
+                        rawTime: alarm['time'] ?? "00:00",
+                        location: alarm['location'] ?? "Unknown Location",
+                        title: alarm['title'] ?? "No Title",
+                        isOn: alarm['isOn'] ?? true,
+                        onDelete: () => deleteAlarm(index),
+                        onToggle: (isOn) => toggleAlarmStatus(index, isOn),
+                      );
+                    },
+                  ),
           ),
           if (sortingCriteria == 1) const ScrollableSheet(),
           if (sortingCriteria == 2)
@@ -158,6 +161,14 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() {
               _selectedbottomNavigationIcon = index;
             });
+
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AlarmsoundScreen()),
+              );
+            }
           },
           type: BottomNavigationBarType.fixed,
           elevation: 0,
