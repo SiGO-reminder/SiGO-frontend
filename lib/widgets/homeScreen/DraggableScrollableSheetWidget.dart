@@ -1,22 +1,44 @@
 import 'package:flutter/material.dart';
+import 'AlarmBoxWidget.dart';
 
-class ScrollableSheet extends StatelessWidget {
-  const ScrollableSheet({super.key});
+class DraggableScrollableSheetWidget extends StatelessWidget {
+  final List<Map<String, dynamic>> futureAlarms;
+  final Future<void> Function(String, bool) onToggle;
+  final Future<void> Function(String) onDelete;
+
+  const DraggableScrollableSheetWidget({
+    super.key,
+    required this.futureAlarms,
+    required this.onToggle,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // 알람 데이터를 날짜별로 그룹화
+    final Map<String, List<Map<String, dynamic>>> groupedAlarms = {};
+    for (var alarm in futureAlarms) {
+      final date = alarm['date'] ?? 'Unknown Date';
+      if (!groupedAlarms.containsKey(date)) {
+        groupedAlarms[date] = [];
+      }
+      groupedAlarms[date]?.add(alarm);
+    }
+
+    final sortedDates = groupedAlarms.keys.toList()..sort();
+
     return DraggableScrollableSheet(
-      initialChildSize: 0.05,
-      minChildSize: 0.05,
-      maxChildSize: 1.0,
+      initialChildSize: 0.15,
+      minChildSize: 0.1,
+      maxChildSize: 0.8,
       builder: (BuildContext context, ScrollController scrollController) {
         return SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 2),
           controller: scrollController,
           child: Column(
             children: [
+              // 상단 핸들바
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start, // 상단 정렬
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
@@ -33,9 +55,7 @@ class ScrollableSheet extends StatelessWidget {
                       decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(
-                            10,
-                          ),
+                          topRight: Radius.circular(10),
                           topLeft: Radius.circular(10),
                         ),
                         boxShadow: [
@@ -43,7 +63,7 @@ class ScrollableSheet extends StatelessWidget {
                             color: Color(0x19000000),
                             spreadRadius: 0,
                             blurRadius: 30,
-                            offset: Offset(0, 3), // changes position of shadow
+                            offset: Offset(0, 3),
                           ),
                         ],
                       ),
@@ -62,6 +82,7 @@ class ScrollableSheet extends StatelessWidget {
                   ),
                 ],
               ),
+              // 섹션 구분 디자인
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,8 +100,7 @@ class ScrollableSheet extends StatelessWidget {
                             color: Color(0x19000000),
                             spreadRadius: 0,
                             blurRadius: 5.0,
-                            offset:
-                            Offset(0, -0.01), // changes position of shadow
+                            offset: Offset(0, -0.01),
                           ),
                         ],
                       ),
@@ -109,8 +129,7 @@ class ScrollableSheet extends StatelessWidget {
                             color: Color(0x19000000),
                             spreadRadius: 0,
                             blurRadius: 5.0,
-                            offset:
-                            Offset(5, -0.01), // changes position of shadow
+                            offset: Offset(5, -0.01),
                           ),
                         ],
                       ),
@@ -118,16 +137,15 @@ class ScrollableSheet extends StatelessWidget {
                   ),
                 ],
               ),
+              // 알람 데이터 섹션
               Container(
-                height: 1500,
                 decoration: const BoxDecoration(
                   color: Color(0xffF4F5F7),
                 ),
-                child: const Column(
+                child: Column(
                   children: [
-                    Row(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start, // Row 내에서 Text를 상단에 정렬
+                    // "향후 일정 보기" 제목
+                    const Row(
                       children: [
                         Padding(
                           padding: EdgeInsets.fromLTRB(23, 13, 0, 1),
@@ -148,13 +166,18 @@ class ScrollableSheet extends StatelessWidget {
                             color: Color(0xff757575),
                             size: 20,
                           ),
-                        )
+                        ),
                       ],
                     ),
-                    nextCalender(),
-                    nextCalender(),
-                    nextCalender(),
-                    nextCalender(),
+                    ...sortedDates.map((date) {
+                      final alarms = groupedAlarms[date]!;
+                      return NextCalender(
+                        date: date,
+                        alarms: alarms,
+                        onToggle: onToggle,
+                        onDelete: onDelete,
+                      );
+                    }).toList(),
                   ],
                 ),
               ),
@@ -166,34 +189,48 @@ class ScrollableSheet extends StatelessWidget {
   }
 }
 
-class nextCalender extends StatelessWidget {
-  const nextCalender({
+class NextCalender extends StatelessWidget {
+  final String date;
+  final List<Map<String, dynamic>> alarms;
+  final Future<void> Function(String, bool) onToggle;
+  final Future<void> Function(String) onDelete;
+
+  const NextCalender({
     super.key,
+    required this.date,
+    required this.alarms,
+    required this.onToggle,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 17, vertical: 6),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 17, vertical: 6),
       child: ExpansionTile(
         minTileHeight: 36,
         controlAffinity: ListTileControlAffinity.leading,
         title: Text(
-          "2077/01/01",
-          style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w300,
-              color: Color(0xFF757575)),
+          date,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w300,
+            color: Color(0xFF757575),
+          ),
         ),
-        initiallyExpanded: false,
-        backgroundColor: Color(0xffF4F5F7),
         iconColor: Colors.blue,
         collapsedBackgroundColor: Colors.white,
-        children: [
-          //AlarmBox(),
-          //AlarmBox(),
-          //AlarmBox(),
-        ],
+        backgroundColor: const Color(0xffF4F5F7),
+        children: alarms.map((alarm) {
+          return AlarmBoxWidget(
+            rawTime: alarm['time'] ?? "00:00",
+            location: alarm['location'] ?? "Unknown Location",
+            title: alarm['title'] ?? "No Title",
+            isOn: alarm['isOn'] ?? true,
+            onDelete: () => onDelete(alarm['id']),
+            onToggle: (value) => onToggle(alarm['id'], value),
+          );
+        }).toList(),
       ),
     );
   }

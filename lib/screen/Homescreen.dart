@@ -4,7 +4,7 @@ import 'package:projects/widgets/homeScreen/DateCircleWidget.dart';
 import 'package:projects/widgets/homeScreen/PlusbuttonWidget.dart';
 import 'package:projects/widgets/homeScreen/PopupMenuButtonWidget.dart';
 import 'package:projects/widgets/homeScreen/DraggableScrollableSheetWidget.dart';
-import 'package:projects/widgets/homeScreen/AlarmBoxWidget.dart';
+import 'package:projects/widgets/homeScreen/AlarmBoxWidget.dart' as AlarmBox;
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:projects/utils/DataStorage.dart';
@@ -20,7 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedbottomNavigationIcon = 1;
   int sortingCriteria = 1; // 사용자별 정렬 기준
   late String currentDate; // 오늘 날짜를 저장할 변수
-  List<Map<String, dynamic>> alarms = []; // 알람 데이터 리스트
+  List<Map<String, dynamic>> alarms = []; // 오늘의 알람 리스트
+  List<Map<String, dynamic>> futureAlarms = []; // 미래의 알람 리스트
 
   @override
   void initState() {
@@ -31,22 +32,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> loadAlarms() async {
     List<Map<String, dynamic>> loadedAlarms = await DataStorage.loadAlarms();
-    String today = DateFormat('yyyy-MM-dd').format(DateTime.now()); // 오늘 날짜 형식
+    String today = DateFormat('yyyy-MM-dd').format(DateTime.now());
     setState(() {
-      alarms = loadedAlarms.where((alarm) => alarm['date'] == today).toList(); // 오늘의 알람 필터링
+      alarms = loadedAlarms.where((alarm) => alarm['date'] == today).toList();
+      futureAlarms = loadedAlarms.where((alarm) {
+        DateTime alarmDate = DateTime.parse(alarm['date']);
+        return alarmDate.isAfter(DateTime.now());
+      }).toList();
     });
   }
 
-  Future<void> toggleAlarmStatus(int index, bool isOn) async {
-    await DataStorage.updateAlarmStatus(index, isOn); // 상태 저장
-    setState(() {
-      alarms[index]['isOn'] = isOn; // UI 업데이트
-    });
+  Future<void> toggleAlarmStatus(String id, bool isOn) async {
+    await DataStorage.updateAlarmStatus(id, isOn);
+    loadAlarms();
   }
 
-  Future<void> deleteAlarm(int index) async {
-    await DataStorage.deleteAlarm(index); // 데이터베이스에서 알람 삭제
-    loadAlarms(); // 삭제 후 데이터 새로고침
+  Future<void> deleteAlarm(String id) async {
+    await DataStorage.deleteAlarm(id);
+    loadAlarms();
   }
 
   @override
@@ -62,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 오늘 날짜 표시
                 Text(
                   currentDate,
                   style: const TextStyle(
@@ -72,7 +74,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     letterSpacing: -0.32,
                   ),
                 ),
-                // 팝업 메뉴
                 PopupMenuWidget(
                   onCriteriaSelected: (criteria) {
                     setState(() {
@@ -88,7 +89,14 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Stack(
         children: [
           SafeArea(
-            child: alarms.isEmpty
+            child: sortingCriteria == 2
+                ? const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: DateCircle(),
+            )
+                : alarms.isEmpty
                 ? Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -120,25 +128,23 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: alarms.length,
               itemBuilder: (context, index) {
                 final alarm = alarms[index];
-                return AlarmBoxWidget(
-                  key: ValueKey(alarm['time'] + alarm['title']), // 고유 키
+                return AlarmBox.AlarmBoxWidget(
+                  key: ValueKey(alarm['id']),
                   rawTime: alarm['time'] ?? "00:00",
                   location: alarm['location'] ?? "Unknown Location",
                   title: alarm['title'] ?? "No Title",
                   isOn: alarm['isOn'] ?? true,
-                  onDelete: () => deleteAlarm(index),
-                  onToggle: (isOn) => toggleAlarmStatus(index, isOn),
+                  onDelete: () => deleteAlarm(alarm['id']),
+                  onToggle: (isOn) => toggleAlarmStatus(alarm['id'], isOn),
                 );
               },
             ),
           ),
-          if (sortingCriteria == 1) const ScrollableSheet(),
-          if (sortingCriteria == 2)
-            const Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: DateCircle(),
+          if (sortingCriteria == 1)
+            DraggableScrollableSheetWidget(
+              futureAlarms: futureAlarms,
+              onToggle: toggleAlarmStatus,
+              onDelete: deleteAlarm,
             ),
         ],
       ),
