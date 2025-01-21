@@ -201,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       )
                     : ListView.builder(
-                        padding: EdgeInsets.zero,
+                        padding: const EdgeInsets.only(top: 11),
                         itemCount: alarms.length,
                         itemBuilder: (context, index) {
                           final alarm = alarms[index];

@@ -28,8 +28,8 @@ class DraggableScrollableSheetWidget extends StatelessWidget {
     final sortedDates = groupedAlarms.keys.toList()..sort();
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.15,
-      minChildSize: 0.1,
+      initialChildSize: 0.05,
+      minChildSize: 0.05,
       maxChildSize: 0.8,
       builder: (BuildContext context, ScrollController scrollController) {
         return SingleChildScrollView(
