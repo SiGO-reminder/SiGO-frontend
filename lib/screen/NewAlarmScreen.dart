@@ -24,6 +24,7 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
   String? transport;
   String? x; // 경도
   String? y; // 위도
+  int preparationTime = 0; // 준비 시간 기본값
 
   // 알람 저장 기능
   void onConfirm() async {
@@ -62,6 +63,7 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
       transport: transport!,
       x: x!, // 경도 저장
       y: y!, // 위도 저장
+      preparationTime: preparationTime, // 준비 시간 저장
     );
 
     // 저장 완료 메시지
@@ -182,7 +184,7 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                       selectedTime: selectedTime,
                       onTimeSelected: (time) {
                         setState(
-                          () {
+                              () {
                             selectedTime = time;
                           },
                         );
@@ -202,7 +204,7 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                           context,
                           MaterialPageRoute(
                               builder: (context) =>
-                                  const LocationSearchScreen()),
+                              const LocationSearchScreen()),
                         );
                         if (result != null) {
                           setState(() {
@@ -272,9 +274,16 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
                       endIndent: 0,
                     ),
 
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(17, 2, 0, 0),
-                      child: PreparationTime(),
+                    // 준비 시간 선택
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(17, 2, 0, 0),
+                      child: PreparationTime(
+                        onPreparationTimeSelected: (int time) {
+                          setState(() {
+                            preparationTime = time; // 선택된 준비 시간 설정
+                          });
+                        },
+                      ),
                     ),
 
                     // 확인 버튼
@@ -287,9 +296,9 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
               child: ConfirmButtonWidget(
                 //확인차 날짜 조건만 넣음
                 onPressed: (selectedDate != null) &&
-                        (selectedTime != null) &&
-                        (location != null) &&
-                        (transport != null)
+                    (selectedTime != null) &&
+                    (location != null) &&
+                    (transport != null)
                     ? onConfirm
                     : null,
               ),
