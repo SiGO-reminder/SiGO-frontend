@@ -14,8 +14,19 @@ class DataStorage {
     required String transport,
     required String x,
     required String y,
+    int preparationTime = 0,
     bool isOn = true,
+
   }) async {
+    print('Saved Alarm Data:');
+    print('Title: $title');
+    print('Date: $date');
+    print('Time: $time');
+    print('Location: $location');
+    print('Transport: $transport');
+    print('Longitude: $x');
+    print('Latitude: $y');
+    print('Preparation Time: $preparationTime');
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String id = DateTime.now().millisecondsSinceEpoch.toString(); // 고유 ID 생성
 
@@ -28,6 +39,7 @@ class DataStorage {
       "transport": transport,
       "x": x,
       "y": y,
+      'preparationTime': preparationTime, // 준비시간 저장
       "isOn": isOn,
     };
 

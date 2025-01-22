@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 class PreparationTime extends StatefulWidget {
+  final Function(int) onPreparationTimeSelected; // 선택된 시간 전달 콜백
+
   const PreparationTime({
-    super.key,
-  });
+    Key? key,
+    required this.onPreparationTimeSelected,
+  }) : super(key: key);
 
   @override
   State<PreparationTime> createState() => _PreparationTimeState();
@@ -27,6 +30,11 @@ class _PreparationTimeState extends State<PreparationTime> {
             onTap: () {
               setState(() {
                 mainPressed = !mainPressed;
+                if (!mainPressed) {
+                  // 준비 시간 선택 해제 시 0 전달
+                  widget.onPreparationTimeSelected(0);
+                  selectedIndex = -1;
+                }
               });
             },
             child: Container(
@@ -45,7 +53,7 @@ class _PreparationTimeState extends State<PreparationTime> {
                     Icon(
                       Icons.add,
                       color:
-                          mainPressed ? Colors.white : const Color(0xFFA6A6A6),
+                      mainPressed ? Colors.white : const Color(0xFFA6A6A6),
                     ),
                     Text(
                       '준비시간 추가',
@@ -60,11 +68,9 @@ class _PreparationTimeState extends State<PreparationTime> {
                     ),
                   ],
                 ),
-                // child:
               ),
             ),
           ),
-          // 버튼을 누르면 보여줄 Row
           if (mainPressed)
             Padding(
               padding: const EdgeInsets.only(top: 12),
@@ -77,6 +83,7 @@ class _PreparationTimeState extends State<PreparationTime> {
                     onTap: () {
                       setState(() {
                         selectedIndex = index;
+                        widget.onPreparationTimeSelected(times[index]); // 선택 시간 전달
                       });
                     },
                     child: Container(
