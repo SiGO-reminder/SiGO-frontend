@@ -21,7 +21,8 @@ class DateCircle extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: days.map((date) {
-          final isSelected = DateFormat('yyyy-MM-dd').format(date) == selectedDate;
+          final isSelected =
+              DateFormat('yyyy-MM-dd').format(date) == selectedDate;
 
           return GestureDetector(
             onTap: () => onDateSelected(date),

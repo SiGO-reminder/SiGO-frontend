@@ -56,7 +56,7 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
     final formattedTime = getFormattedTime(widget.rawTime);
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: Slidable(
         key: const ValueKey('AlarmBox'),
         direction: Axis.horizontal,
@@ -68,7 +68,8 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
               onPressed: (context) {
                 widget.onDelete();
               },
-              backgroundColor: isChecked ? const Color(0xFF5EB6FF) : const Color(0xffA9A9A9),
+              backgroundColor:
+                  isChecked ? const Color(0xFF5EB6FF) : const Color(0xffA9A9A9),
               foregroundColor: Colors.white,
               borderRadius: const BorderRadius.only(
                 bottomRight: Radius.circular(10),
@@ -107,7 +108,9 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
                   child: Text(
                     formattedTime.split(' ')[0],
                     style: TextStyle(
-                      color: isChecked ? const Color(0xFF5EB6FF) : const Color(0xffA9A9A9),
+                      color: isChecked
+                          ? const Color(0xFF5EB6FF)
+                          : const Color(0xffA9A9A9),
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
                     ),
@@ -119,7 +122,9 @@ class _AlarmBoxWidgetState extends State<AlarmBoxWidget> {
                   child: Text(
                     formattedTime.split(' ')[1],
                     style: TextStyle(
-                      color: isChecked ? const Color(0xFF5EB6FF) : const Color(0xffA9A9A9),
+                      color: isChecked
+                          ? const Color(0xFF5EB6FF)
+                          : const Color(0xffA9A9A9),
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                     ),

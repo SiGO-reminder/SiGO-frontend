@@ -43,7 +43,8 @@ class TimePickerWidget extends StatelessWidget {
           fontSize: 20,
           fontWeight: FontWeight.w400,
           decoration: TextDecoration.underline,
-          decorationColor: const Color(0xffD9D9D9),
+          decorationColor:
+              selectedTime == null ? const Color(0xffD9D9D9) : Colors.white,
         ),
       ),
       onTap: () async {

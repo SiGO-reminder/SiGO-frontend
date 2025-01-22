@@ -28,8 +28,8 @@ class DraggableScrollableSheetWidget extends StatelessWidget {
     final sortedDates = groupedAlarms.keys.toList()..sort();
 
     return DraggableScrollableSheet(
-      initialChildSize: 0.15,
-      minChildSize: 0.1,
+      initialChildSize: 0.05,
+      minChildSize: 0.05,
       maxChildSize: 0.8,
       builder: (BuildContext context, ScrollController scrollController) {
         return SingleChildScrollView(
@@ -144,8 +144,10 @@ class DraggableScrollableSheetWidget extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    // "향후 일정 보기" 제목
                     const Row(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start, // Row 내에서 Text를 상단에 정렬
+
                       children: [
                         Padding(
                           padding: EdgeInsets.fromLTRB(23, 13, 0, 1),
@@ -177,7 +179,7 @@ class DraggableScrollableSheetWidget extends StatelessWidget {
                         onToggle: onToggle,
                         onDelete: onDelete,
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),
