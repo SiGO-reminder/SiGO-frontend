@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       bottomNavigationBar: SizedBox(
-        height: 69,
+        height: 79,
         child: BottomNavigationBar(
           currentIndex: _selectedbottomNavigationIcon,
           onTap: (index) {

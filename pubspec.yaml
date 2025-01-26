@@ -2,7 +2,7 @@ name: projects
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -38,11 +38,10 @@ dependencies:
   flutter_svg: ^2.0.9
   flutter_native_splash: ^2.4.4
   intl: ^0.19.0
-  
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-
 
 dev_dependencies:
   flutter_test:
@@ -56,13 +55,11 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   # flutter_launcher_icons: "^0.13.1"
 
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -78,8 +75,8 @@ flutter:
     - assets/images/basil_stack-solid.svg #스택 아이콘
     - assets/images/sigo2.png #시고 아이콘
     - assets/images/page.png # 알람이 없을때
-    - assets\images\sigo1.png
-    - assets\images\fluent-mdl2_cancel.svg # 알람끄기 버튼
+    - assets/images/sigo1.png
+    - assets/images/fluent-mdl2_cancel.svg # 알람끄기 버튼
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -117,7 +114,7 @@ flutter:
         - asset: assets/fonts/Pretendard-Thin.otf
           weight: 100
     # - family: Schyler
-      # fonts:
+    # fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
@@ -129,8 +126,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-       # 웹 환경에서도 가운데 맞춤
-
+  # 웹 환경에서도 가운데 맞춤
 # flutter_launcher_icons:
 #   android: "launcher_icon"
 #   ios: "AppIcon"
@@ -139,6 +135,5 @@ flutter:
 #   adaptive_icon_background: "#FFFFFF"
 #   adaptive_icon_foreground: "assets/images/sigo1.png"
 #   remove_alpha_ios: true
-#   ios_dynamic: true 
-
+#   ios_dynamic: true
 
