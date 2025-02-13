@@ -1,12 +1,32 @@
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter/material.dart';
+import 'package:projects/screen/AlarmSoundScreen.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+
 
 class DataStorage {
   static const String alarmKey = 'alarms';
 
-  // **1. 알람 저장**
+  static String convertTransport(String transport) {
+    switch (transport.trim()) {
+      case '택시':
+        return 'driving';
+      case '버스':
+        return 'transit';
+      case '도보':
+        return 'walking';
+      default:
+        return 'transit'; // 기본값 설정
+    }
+  }
+
   static Future<void> saveAlarm({
+    required BuildContext context,
     required String title,
     required String date,
     required String time,
@@ -14,57 +34,138 @@ class DataStorage {
     required String transport,
     required String x,
     required String y,
-    int preparationTime = 0,
+    required int preparationTime,
     bool isOn = true,
-
   }) async {
-    print('Saved Alarm Data:');
-    print('Title: $title');
-    print('Date: $date');
-    print('Time: $time');
-    print('Location: $location');
-    print('Transport: $transport');
-    print('Longitude: $x');
-    print('Latitude: $y');
-    print('Preparation Time: $preparationTime');
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String id = DateTime.now().millisecondsSinceEpoch.toString(); // 고유 ID 생성
+    try {
+      final now = DateTime.now();
+      final DateTime parsedDate = DateFormat('yyyy-MM-dd').parseStrict(date.split('T')[0]);
 
-    Map<String, dynamic> alarmData = {
-      "id": id, // 고유 ID 추가
-      "title": title,
-      "date": DateFormat('yyyy-MM-dd').format(DateTime.parse(date)), // 날짜 형식 통일
-      "time": time,
-      "location": location,
-      "transport": transport,
-      "x": x,
-      "y": y,
-      'preparationTime': preparationTime, // 준비시간 저장
-      "isOn": isOn,
-    };
+      DateTime parsedTime;
+      if (RegExp(r'^[0-9]{1,2}:[0-9]{2} [APap][Mm]$').hasMatch(time)) {
+        parsedTime = DateFormat('hh:mm a').parseStrict(time);
+      } else if (RegExp(r'^[0-9]{1,2}:[0-9]{2}$').hasMatch(time)) {
+        parsedTime = DateFormat('HH:mm').parseStrict(time);
+      } else {
+        throw FormatException("잘못된 시간 형식: $time");
+      }
 
-    List<String> alarms = prefs.getStringList(alarmKey) ?? [];
-    alarms.add(jsonEncode(alarmData));
-    await prefs.setStringList(alarmKey, alarms);
+      final DateTime alarmDateTime = DateTime(parsedDate.year, parsedDate.month, parsedDate.day, parsedTime.hour, parsedTime.minute);
+      final Duration difference = alarmDateTime.difference(now);
+
+      String convertedTransport = convertTransport(transport);
+      print("🚀 변환된 Transport: $convertedTransport");
+
+      if (difference <= const Duration(hours: 2, minutes: 30)) {
+        final Position position = await Geolocator.getCurrentPosition();
+
+        final response = await sendApiRequest(
+          startX: position.longitude.toString(),
+          startY: position.latitude.toString(),
+          endX: x,
+          endY: y,
+          alarmTime: DateFormat('yyyy-MM-dd HH:mm:ss').format(alarmDateTime),
+          preparationTime: preparationTime,
+          transport: convertedTransport,
+        );
+
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("지금 바로 출발하셔야 합니다!")),
+          );
+          return;
+        }
+      }
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String id = DateTime.now().millisecondsSinceEpoch.toString();
+
+      Map<String, dynamic> alarmData = {
+        "id": id,
+        "title": title,
+        "date": DateFormat('yyyy-MM-dd').format(parsedDate),
+        "time": DateFormat('HH:mm').format(parsedTime),
+        "location": location,
+        "transport": convertedTransport,
+        "x": x,
+        "y": y,
+        "preparationTime": preparationTime,
+        "isOn": isOn,
+      };
+
+      List<String> alarms = prefs.getStringList(alarmKey) ?? [];
+      alarms.add(jsonEncode(alarmData));
+      await prefs.setStringList(alarmKey, alarms);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('알람이 저장되었습니다!')),
+      );
+    } catch (e) {
+      print("❌ 날짜 변환 오류: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("알람 저장 중 오류 발생. 날짜 형식을 확인하세요. 에러: $e")),
+      );
+    }
   }
 
-  // **2. 알람 데이터 불러오기**
+  static Future<http.Response> sendApiRequest({
+    required String startX,
+    required String startY,
+    required String endX,
+    required String endY,
+    required String alarmTime,
+    required int preparationTime,
+    required String transport,
+  }) async {
+    final String convertedTransport = transport.trim();
+    final url = Uri.parse("http://10.0.2.2:8080/api/v0/travel-time?transport=$convertedTransport");
+    final body = jsonEncode({
+      "start_x": startX,
+      "start_y": startY,
+      "end_x": endX,
+      "end_y": endY,
+      "alarm_time": alarmTime,
+      "preparation_time": preparationTime,
+    });
+
+    print("📡 API 요청 URL: $url");
+    print("📡 요청 본문: $body");
+
+    try {
+      final response = await http.post(
+        url,
+        body: body,
+        headers: {"Content-Type": "application/json"},
+      );
+
+      print("📡 응답 코드: ${response.statusCode}");
+      print("📡 응답 본문: ${response.body}");
+
+      if (response.statusCode != 200) {
+        print("❌ API 요청 실패: ${response.statusCode} ${response.body}");
+      }
+
+      return response;
+    } catch (e) {
+      print("❌ API 요청 중 오류 발생: $e");
+      return http.Response("API 요청 실패", 500);
+    }
+  }
+
+
+
   static Future<List<Map<String, dynamic>>> loadAlarms() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> alarms = prefs.getStringList(alarmKey) ?? [];
-    return alarms.map((alarm) {
-      return jsonDecode(alarm) as Map<String, dynamic>;
-    }).toList();
+    return alarms.map((alarm) => jsonDecode(alarm) as Map<String, dynamic>).toList();
   }
 
-  // **3. 알람 상태 업데이트 (ID 기반)**
   static Future<void> updateAlarmStatus(String id, bool isOn) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> alarms = prefs.getStringList(alarmKey) ?? [];
     for (int i = 0; i < alarms.length; i++) {
       Map<String, dynamic> alarm = jsonDecode(alarms[i]);
       if (alarm['id'] == id) {
-        alarm['isOn'] = isOn; // 상태 업데이트
+        alarm['isOn'] = isOn;
         alarms[i] = jsonEncode(alarm);
         break;
       }
@@ -72,54 +173,45 @@ class DataStorage {
     await prefs.setStringList(alarmKey, alarms);
   }
 
-  // **4. 알람 업데이트 (ID 기반)**
-  static Future<void> updateAlarm(String id, Map<String, dynamic> updatedData) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> alarms = prefs.getStringList(alarmKey) ?? [];
-    for (int i = 0; i < alarms.length; i++) {
-      Map<String, dynamic> alarm = jsonDecode(alarms[i]);
-      if (alarm['id'] == id) {
-        alarms[i] = jsonEncode({...alarm, ...updatedData}); // 데이터 병합 후 업데이트
-        break;
-      }
-    }
-    await prefs.setStringList(alarmKey, alarms);
-  }
-
-  // **5. 알람 삭제 (ID 기반)**
   static Future<void> deleteAlarm(String id) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> alarms = prefs.getStringList(alarmKey) ?? [];
-    alarms.removeWhere((alarm) {
-      Map<String, dynamic> decodedAlarm = jsonDecode(alarm);
-      return decodedAlarm['id'] == id;
-    });
+    alarms.removeWhere((alarm) => jsonDecode(alarm)['id'] == id);
     await prefs.setStringList(alarmKey, alarms);
   }
 
-  // **6. 모든 알람 삭제**
   static Future<void> clearAlarms() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove(alarmKey);
   }
+}
 
-  // **7. 기존 알람 데이터에 ID 추가 (초기화)**
-  static Future<void> initializeAlarms() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String> alarms = prefs.getStringList(alarmKey) ?? [];
-    bool needsUpdate = false;
+Future<bool> requestLocationPermission() async {
+  LocationPermission permission = await Geolocator.checkPermission();
 
-    for (int i = 0; i < alarms.length; i++) {
-      Map<String, dynamic> alarm = jsonDecode(alarms[i]);
-      if (!alarm.containsKey('id')) {
-        alarm['id'] = DateTime.now().millisecondsSinceEpoch.toString(); // ID 추가
-        alarms[i] = jsonEncode(alarm);
-        needsUpdate = true;
-      }
-    }
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
 
-    if (needsUpdate) {
-      await prefs.setStringList(alarmKey, alarms);
+    if (permission == LocationPermission.denied) {
+      print("❌ 위치 권한이 거부되었습니다.");
+      return false;
     }
   }
+
+  if (permission == LocationPermission.deniedForever) {
+    print("❌ 위치 권한이 영구적으로 거부되었습니다. 설정에서 권한을 허용해주세요.");
+    return false;
+  }
+
+  return true;
 }
+
+
+
+void triggerAlarm() {
+  print("🔔 알람이 울리고 있습니다!");
+  runApp(MaterialApp(
+    home: AlarmsoundScreen(),
+  ));
+}
+

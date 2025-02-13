@@ -18,7 +18,6 @@ class _TransportSelectorWidgetState extends State<TransportSelectorWidget> {
     final transportOptions = [
       {'name': '버스', 'icon': Icons.directions_bus},
       {'name': '택시', 'icon': Icons.local_taxi},
-      {'name': '자전거', 'icon': Icons.directions_bike},
       {'name': '도보', 'icon': Icons.directions_walk},
     ];
 

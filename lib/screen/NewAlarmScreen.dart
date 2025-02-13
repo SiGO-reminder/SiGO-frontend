@@ -56,19 +56,15 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
 
     // 데이터 저장
     await DataStorage.saveAlarm(
+      context: context, // 여기에 context 추가
       title: titleController.text,
-      date: selectedDate.toString(),
+      date: selectedDate!.toIso8601String(),
       time: selectedTime!.format(context),
       location: location!,
       transport: transport!,
-      x: x!, // 경도 저장
-      y: y!, // 위도 저장
-      preparationTime: preparationTime, // 준비 시간 저장
-    );
-
-    // 저장 완료 메시지
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('알람이 저장되었습니다!')),
+      x: x!,
+      y: y!,
+      preparationTime: preparationTime,
     );
 
     Navigator.pop(context); // 화면 종료

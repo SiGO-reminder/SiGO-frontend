@@ -28,7 +28,7 @@ class _LocationSearchScreenState extends State<LocationSearchScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:3000/api/v0/naver-map/search'),
+        Uri.parse('http://10.0.2.2:3002/api/v0/naver-map/search'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'address': query}),
       );
