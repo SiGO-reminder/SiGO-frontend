@@ -55,7 +55,7 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
     }
 
     // 데이터 저장
-    await DataStorage.saveAlarm(
+    bool isSaved = await DataStorage.saveAlarm(
       context: context, // 여기에 context 추가
       title: titleController.text,
       date: selectedDate!.toIso8601String(),
@@ -67,7 +67,9 @@ class _NewAlarmScreenState extends State<NewAlarmScreen> {
       preparationTime: preparationTime,
     );
 
-    Navigator.pop(context); // 화면 종료
+    if(isSaved){
+      Navigator.pop(context);
+    }// 화면 종료
   }
 
   // 오류 메시지

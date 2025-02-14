@@ -2,30 +2,54 @@ import 'dart:convert';
 import 'package:workmanager/workmanager.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/material.dart';
+import 'package:projects/screen/AlarmSoundScreen.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:projects/utils/DataStorage.dart';
+import 'dart:convert';
+
+Future<void> clearExistingWorkManagerTasks() async {
+  print("🛑 기존 WorkManager 작업 삭제 중...");
+  await Workmanager().cancelAll();
+  print("✅ 모든 WorkManager 작업 삭제 완료.");
+}
 
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
     try {
-      // 현재 위치 가져오기
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      // ✅ API 요청 보내기 (교통수단 반영)
-      final response = await sendApiRequest(
-        startX: position.longitude,
-        startY: position.latitude,
+      final response = await DataStorage.sendApiRequest(
+        startX: inputData?['start_x'],
+        startY: inputData?['start_y'],
         endX: inputData?['end_x'],
         endY: inputData?['end_y'],
-        time: inputData?['time'],
-        transport: inputData?['transport'], // 🛠 교통수단 추가
+        alarmTime: inputData?['alarm_time'],
+        preparationTime: inputData?['preparation_time'],
+        transport: inputData?['transport'],
       );
 
-      if (response == "OK") {
-        print("✅ OK 신호 받음, WorkManager 중지");
-        Workmanager().cancelByUniqueName("backgroundApiCheck");
-      } else {
-        print("⚠️ 5분 후 재시도");
+      if (response.statusCode == 200) {
+        print("✅ OK 신호 받음, WorkManager 중지 및 알람 실행");
+        Workmanager().cancelByUniqueName(task);
+        triggerAlarm();
+      } else if (response.statusCode == 202) {
+        print("⚠️ 5분 후 다시 실행");
+
+        Workmanager().cancelByUniqueName(task);
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        Workmanager().registerOneOffTask(
+          task,
+          "check_alarm",
+          initialDelay: const Duration(minutes: 5),
+          inputData: inputData!,
+          existingWorkPolicy: ExistingWorkPolicy.replace,
+        );
       }
     } catch (e) {
       print("❌ 오류 발생: $e");
@@ -34,47 +58,23 @@ void callbackDispatcher() {
   });
 }
 
-Future<String> sendApiRequest({
-  required double startX,
-  required double startY,
-  required String? endX,
-  required String? endY,
-  required String? time,
-  required String? transport, // 🛠 추가
-}) async {
-  // ✅ 교통수단 URL 매핑
-  String transportType = "driving"; // 기본값
-  if (transport == "버스") {
-    transportType = "transit";
-  } else if (transport == "도보") {
-    transportType = "walking";
-  }
+void startForegroundService() {
+  FlutterForegroundTask.startService(
+    notificationTitle: '알람 대기 중',
+    notificationText: '알람이 2시간 30분 후에 울릴 예정입니다.',
+    callback: () async {
+      print("🔔 Foreground Service 실행 중");
+    },
+  );
+}
 
-  final url = Uri.parse("http://10.0.2.2:8080/api/v0/travel-time?transport=$transportType");
+void stopForegroundService() {
+  FlutterForegroundTask.stopService();
+}
 
-  final body = jsonEncode({
-    "start_x": startX.toString(),
-    "start_y": startY.toString(),
-    "end_x": endX,
-    "end_y": endY,
-    "time": time,
-  });
-
-  try {
-    final response = await http.post(
-      url,
-      body: body,
-      headers: {"Content-Type": "application/json"},
-    );
-
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      print("API 요청 실패: ${response.statusCode}");
-      return "ERROR";
-    }
-  } catch (e) {
-    print("API 요청 오류: $e");
-    return "ERROR";
-  }
+void triggerAlarm() {
+  print("🔔 알람이 울리고 있습니다!");
+  runApp(MaterialApp(
+    home: AlarmsoundScreen(),
+  ));
 }

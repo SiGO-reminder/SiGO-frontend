@@ -4,6 +4,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> <!-- 재부팅 후 WorkManager 실행 -->
 
     <application
         android:label="SiGo"
@@ -33,6 +36,31 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2"/>
+
+        <!-- WorkManager 서비스 -->
+        <service
+            android:name="dev.fluttercommunity.plus.workmanager.BackgroundWorker"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false"
+            android:foregroundServiceType="location"/>
+
+        <!-- Foreground Service (알람 2시간 30분 전부터 실행) -->
+        <service
+            android:name=".ForegroundService"
+            android:exported="false"
+            android:foregroundServiceType="location"/>
+
+        <!-- 부팅 후 WorkManager 자동 실행 -->
+        <receiver
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
+            android:name="dev.fluttercommunity.plus.workmanager.WorkManagerBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
     <queries>

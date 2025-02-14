@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:workmanager/workmanager.dart';
 import 'package:flutter/material.dart';
 import 'package:projects/screen/AlarmSoundScreen.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -25,7 +26,7 @@ class DataStorage {
     }
   }
 
-  static Future<void> saveAlarm({
+  static Future<bool> saveAlarm({
     required BuildContext context,
     required String title,
     required String date,
@@ -73,8 +74,50 @@ class DataStorage {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("지금 바로 출발하셔야 합니다!")),
           );
-          return;
+          return false;
         }
+
+        if (response.statusCode == 202) {
+          print("🔄 WorkManager OneOff 실행 (5분 간격)");
+
+          // 기존 작업을 삭제 후 다시 등록 (중복 방지)
+          Workmanager().cancelByUniqueName("check_alarm_${alarmDateTime.millisecondsSinceEpoch}");
+
+          Workmanager().registerOneOffTask(
+            "check_alarm_${alarmDateTime.millisecondsSinceEpoch}",
+            "check_alarm",
+            initialDelay: const Duration(minutes: 5),
+            inputData: {
+              "start_x": x,
+              "start_y": y,
+              "end_x": x,
+              "end_y": y,
+              "alarm_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(alarmDateTime),
+              "preparation_time": preparationTime,
+              "transport": convertedTransport
+            },
+            existingWorkPolicy: ExistingWorkPolicy.replace,
+          );
+        }
+      } else {
+        final DateTime workManagerStartTime = alarmDateTime.subtract(const Duration(hours: 2, minutes: 30));
+        print("⏳ WorkManager 예약됨: ${workManagerStartTime.toString()}");
+
+        Workmanager().registerOneOffTask(
+          "start_foreground_service_${alarmDateTime.millisecondsSinceEpoch}",
+          "start_foreground_service",
+          initialDelay: workManagerStartTime.difference(now),
+          inputData: {
+            "start_x": x,
+            "start_y": y,
+            "end_x": x,
+            "end_y": y,
+            "alarm_time": DateFormat('yyyy-MM-dd HH:mm:ss').format(alarmDateTime),
+            "preparation_time": preparationTime,
+            "transport": convertedTransport
+          },
+          existingWorkPolicy: ExistingWorkPolicy.replace,
+        );
       }
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -99,12 +142,21 @@ class DataStorage {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('알람이 저장되었습니다!')),
       );
+      return true;
     } catch (e) {
       print("❌ 날짜 변환 오류: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("알람 저장 중 오류 발생. 날짜 형식을 확인하세요. 에러: $e")),
       );
+      return false;
     }
+  }
+
+  static void triggerAlarmScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AlarmsoundScreen()),
+    );
   }
 
   static Future<http.Response> sendApiRequest({
@@ -208,10 +260,4 @@ Future<bool> requestLocationPermission() async {
 
 
 
-void triggerAlarm() {
-  print("🔔 알람이 울리고 있습니다!");
-  runApp(MaterialApp(
-    home: AlarmsoundScreen(),
-  ));
-}
 
